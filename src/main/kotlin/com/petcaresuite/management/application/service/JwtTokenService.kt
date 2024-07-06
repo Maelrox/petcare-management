@@ -10,9 +10,8 @@ import org.springframework.stereotype.Component
 import java.util.*
 import javax.crypto.SecretKey
 
-
 @Component
-class AuthenticationService {
+class JwtTokenService {
 
     @Value("\${jwt.secret.key}")
     lateinit var secret: String

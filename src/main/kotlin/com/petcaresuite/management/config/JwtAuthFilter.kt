@@ -1,6 +1,6 @@
 package com.petcaresuite.management.config
 
-import com.petcaresuite.management.application.service.AuthenticationService
+import com.petcaresuite.management.application.service.JwtTokenService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
@@ -15,7 +15,7 @@ import java.io.IOException
 
 @Component
 class JwtAuthFilter(
-    private val jwtService: AuthenticationService,
+    private val jwtService: JwtTokenService,
     private val userDetailsService: UserDetailsService
 ) : OncePerRequestFilter() {
 
@@ -27,13 +27,12 @@ class JwtAuthFilter(
     ) {
         val authHeader: String? = request.getHeader("Authorization")
         var token: String?
-        var username: String?
         if (authHeader == null || !authHeader.startsWith("Bearer")) {
             filterChain.doFilter(request, response)
             return
         }
         token = authHeader.substring(7)
-        username = jwtService.extractUsername(token)
+        var username = jwtService.extractUsername(token)
         if (username != null && SecurityContextHolder.getContext().authentication == null) {
             val userDetails = userDetailsService.loadUserByUsername(username)
             if (jwtService.validateToken(token, userDetails)) {

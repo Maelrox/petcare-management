@@ -35,8 +35,8 @@ class SecurityConfig(
                 authorize(DispatcherTypeRequestMatcher(DispatcherType.FORWARD), permitAll)
                 authorize(DispatcherTypeRequestMatcher(DispatcherType.ERROR), permitAll)
                 authorize("/authentication/**", permitAll)
-                authorize(anyRequest, denyAll)
-
+                authorize("/user/register", permitAll)
+                authorize(anyRequest, authenticated)
             }
             csrf { disable() }
             sessionManagement {

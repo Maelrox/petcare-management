@@ -1,6 +1,6 @@
-package com.petcaresuite.management.domain.model
+package com.petcaresuite.management.application.dto
 
-data class AuthenticationResponse(
+data class AuthenticationResponseDTO(
     var token: String? = null
 ) {
     companion object {
@@ -17,8 +17,8 @@ data class AuthenticationResponse(
             return this
         }
 
-        fun build(): AuthenticationResponse {
-            return AuthenticationResponse(token)
+        fun build(): AuthenticationResponseDTO {
+            return AuthenticationResponseDTO(token)
         }
     }
 }

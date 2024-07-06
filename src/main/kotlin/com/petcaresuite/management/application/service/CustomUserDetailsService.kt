@@ -1,8 +1,8 @@
 package com.petcaresuite.management.application.service
 
 import com.petcaresuite.management.domain.model.CustomUserDetails
-import com.petcaresuite.management.domain.repository.UserRepository
-import com.petcaresuite.management.infrastructure.persistence.entity.User
+import com.petcaresuite.management.domain.model.User
+import com.petcaresuite.management.domain.repository.IUserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class CustomUserDetailsService(private val userRepository: UserRepository) : UserDetailsService {
+class CustomUserDetailsService(private val userRepository: IUserRepository) : UserDetailsService {
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
