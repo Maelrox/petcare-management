@@ -9,6 +9,6 @@ import org.mapstruct.Mapping
 interface IUserMapper {
     fun toEntity(userModel: User): UserEntity
 
-    @Mapping(target = "password", ignore = true) // TODO: Check this Optionally ignore sensitive fields
+    @Mapping(target = "password", ignore = false) // TODO: Check this Optionally ignore sensitive fields
     fun toModel(userEntity: UserEntity): User
 }

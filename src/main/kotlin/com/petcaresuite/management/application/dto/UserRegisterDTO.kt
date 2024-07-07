@@ -9,7 +9,7 @@ data class UserRegisterDTO(
 
     @field:NotNull(message = "Password is required")
     @field:Size(min = 8, max = 255, message = "Password length must be between 8 and 255 characters")
-    val password: String?,
+    var password: String?,
 
     @field:NotNull(message = "Email is required")
     @field:Email(message = "Email should be valid")
