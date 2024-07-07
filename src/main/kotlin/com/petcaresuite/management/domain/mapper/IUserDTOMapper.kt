@@ -1,5 +1,6 @@
 package com.petcaresuite.management.domain.mapper
 
+import com.petcaresuite.management.application.dto.UserDetailsDTO
 import com.petcaresuite.management.application.dto.UserRegisterDTO
 import com.petcaresuite.management.domain.model.Role
 import com.petcaresuite.management.domain.model.User
@@ -24,5 +25,16 @@ interface IUserDTOMapper {
         Mapping(target = "company", ignore = true)
     )
     fun toUser(userRegisterDTO: UserRegisterDTO, roles: Set<Role>): User
+
+    @Mappings(
+        Mapping(target = "id", ignore = true),
+        Mapping(target = "email", source = "user.email"),
+        Mapping(target = "name", source = "user.name"),
+        Mapping(target = "enabled", constant = "true"),
+        Mapping(target = "roles", ignore = true),
+        Mapping(target = "country", source = "user.country"),
+        Mapping(target = "phone", source = "user.phone"),
+    )
+    fun toUserDetailsDTO(user: User): UserDetailsDTO
 
 }

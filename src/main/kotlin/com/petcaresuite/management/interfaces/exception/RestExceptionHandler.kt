@@ -1,6 +1,7 @@
 package com.petcaresuite.management.interfaces.exception
 
 import com.petcaresuite.management.application.dto.ErrorResponse
+import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import jakarta.validation.ConstraintViolationException
@@ -19,6 +20,18 @@ import java.time.LocalDateTime
 class RestExceptionHandler {
 
     private val logger: Logger = LoggerFactory.getLogger(RestExceptionHandler::class.java)
+
+    @ExceptionHandler(ExpiredJwtException::class)
+    fun handleExpiredJwtException(ex: ExpiredJwtException): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse(
+            timestamp = LocalDateTime.now(),
+            status = HttpStatus.UNAUTHORIZED.value(),
+            error = HttpStatus.UNAUTHORIZED.reasonPhrase,
+            message = ex.message ?: "Token Expired",
+            path = getRequestPath()
+        )
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
 
     @ExceptionHandler(IllegalAccessException::class)
     fun handleIllegalAccessException(ex: IllegalAccessException): ResponseEntity<ErrorResponse> {

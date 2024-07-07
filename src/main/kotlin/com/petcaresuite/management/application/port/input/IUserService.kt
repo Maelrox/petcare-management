@@ -1,13 +1,11 @@
 package com.petcaresuite.management.application.port.input
 
-import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
-import com.petcaresuite.management.application.dto.ResponseDTO
-import com.petcaresuite.management.application.dto.UserRegisterDTO
-import com.petcaresuite.management.application.dto.UserUpdateDTO
+import com.petcaresuite.management.application.dto.*
 
 interface IUserService {
     fun register(userRegisterDTO: UserRegisterDTO): AuthenticationResponseDTO
 
     fun update(userUpdateDTO: UserUpdateDTO): ResponseDTO
+    abstract fun getByToken(token: String): UserDetailsDTO
 
 }

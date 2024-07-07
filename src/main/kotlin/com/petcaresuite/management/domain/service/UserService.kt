@@ -1,22 +1,23 @@
 package com.petcaresuite.management.domain.service
 
+import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.infrastructure.security.JwtTokenService
-import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
-import com.petcaresuite.management.application.dto.ResponseDTO
 import com.petcaresuite.management.domain.model.RoleType
-import com.petcaresuite.management.application.dto.UserRegisterDTO
-import com.petcaresuite.management.application.dto.UserUpdateDTO
 import com.petcaresuite.management.application.port.input.IUserService
 import com.petcaresuite.management.domain.mapper.IUserDTOMapper
 import com.petcaresuite.management.domain.model.Role
+import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.domain.repository.IUserRepository
 import com.petcaresuite.management.domain.valueobject.CustomUserDetails
 import com.petcaresuite.management.infrastructure.persistence.mapper.IRoleMapper
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaRoleRepository
 import com.petcaresuite.management.infrastructure.security.CustomUserDetailsService
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 private const val PASSWORD_REGEX = """^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&\s]{8,}$"""
 
@@ -27,13 +28,14 @@ class UserService(
     private val jwtTokenService: JwtTokenService,
     private val roleRepository: JpaRoleRepository,
     private val roleMapper: IRoleMapper,
-    private val userMapper: IUserDTOMapper
-) : IUserService {
+    private val userMapper: IUserDTOMapper,
+    private val customUserDetailsService: CustomUserDetailsService
+    ) : IUserService {
 
 
     override fun register(userRegisterDTO: UserRegisterDTO): AuthenticationResponseDTO {
         validateUserRegistration(userRegisterDTO)
-        val roles = retrieveRoles(userRegisterDTO)
+        val roles = retrieveRoles(userRegisterDTO.roles!!)
         userRegisterDTO.password = encodePassword(userRegisterDTO.password!!)
         val user = userMapper.toUser(userRegisterDTO, roles)
         userRepository.save(user)
@@ -44,15 +46,37 @@ class UserService(
     override fun update(userUpdateDTO: UserUpdateDTO): ResponseDTO {
         validateUserUpdate(userUpdateDTO)
         val user = userRepository.getById(userUpdateDTO.id!!)
+        userUpdateDTO.password = encodePassword(userUpdateDTO.password!!)
+        setUpdatableFields(userUpdateDTO, user)
         userRepository.save(user)
         return ResponseDTO.generateSuccessResponse(true, "User Updated")
+    }
+
+    override fun getByToken(token: String): UserDetailsDTO {
+        val username = jwtTokenService.extractUsername(token);
+        val userDetails = customUserDetailsService.loadUserByUsername(username)
+        jwtTokenService.validateToken(token, userDetails)
+        val user = getUserByUserName(username)
+        return userMapper.toUserDetailsDTO(user)
+    }
+
+    private fun getUserByUserName(username : String) : User {
+        return userRepository.getUserInfoByUsername(username).get()
+    }
+
+    private fun setUpdatableFields(userUpdateDTO: UserUpdateDTO, user: User) {
+        user.password = userUpdateDTO.password
+        val roles = retrieveRoles(userUpdateDTO.roles!!)
+        user.roles = roles
+        user.country = userUpdateDTO.country
+        user.enabled = userUpdateDTO.enabled!!
+        user.lastModified = LocalDateTime.now()
     }
 
     private fun validateUserUpdate(userUpdateDTO: UserUpdateDTO) {
         validateUpdatePermission(userUpdateDTO)
         validateRoles(userUpdateDTO.roles)
         validatePasswordComplexity(userUpdateDTO.password!!)
-        userUpdateDTO.password = encodePassword(userUpdateDTO.password!!)
     }
 
     private fun validateUpdatePermission(userUpdateDTO: UserUpdateDTO) {
@@ -84,8 +108,8 @@ class UserService(
     }
 
 
-    private fun retrieveRoles(userRegisterDTO: UserRegisterDTO): Set<Role> {
-        return userRegisterDTO.roles?.mapNotNull { roleName ->
+    private fun retrieveRoles(roles: Set<String>): Set<Role> {
+        return roles?.mapNotNull { roleName ->
             roleRepository.findByName(RoleType.valueOf(roleName))
         }?.map { roleMapper.toModel(it) }?.toSet() ?: emptySet()
     }
@@ -100,5 +124,7 @@ class UserService(
     private fun encodePassword(password: String): String {
         return passwordEncoder.encode(password)
     }
+
+
 
 }

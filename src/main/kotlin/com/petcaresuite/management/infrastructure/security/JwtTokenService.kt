@@ -1,6 +1,8 @@
 package com.petcaresuite.management.infrastructure.security
 
+import com.petcaresuite.management.config.TokenExpiredException
 import io.jsonwebtoken.Claims
+import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
@@ -55,11 +57,15 @@ class JwtTokenService {
 
     private fun extractAllClaims(token: String): Claims {
         val secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret))
-        return Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .payload
+        try {
+            return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .payload
+        } catch (ex: ExpiredJwtException) {
+            throw TokenExpiredException("JWT token has expired")
+        }
     }
 
     private fun isTokenExpired(token: String): Boolean {
@@ -67,8 +73,12 @@ class JwtTokenService {
     }
 
     fun validateToken(token: String, userDetails: UserDetails): Boolean {
-        val username = extractUsername(token)
-        return username == userDetails.username && !isTokenExpired(token)
+        try {
+            val username = extractUsername(token)
+            return username == userDetails.username && !isTokenExpired(token)
+        } catch (ex: TokenExpiredException) {
+            throw ex
+        }
     }
 
 }

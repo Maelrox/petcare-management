@@ -22,8 +22,8 @@ import org.springframework.security.web.util.matcher.DispatcherTypeRequestMatche
 @EnableWebSecurity
 class SecurityConfig(
     private val authFilter: JwtAuthFilter,
-    private val customUserDetailsService: CustomUserDetailsService
-) {
+    private val customUserDetailsService: CustomUserDetailsService,
+    )  {
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
