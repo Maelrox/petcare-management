@@ -6,6 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 class CustomUserDetails(user: User) : UserDetails {
+    private val id: Long = user.id
     private val name: String = user.username
     private val password: String = user.password!!
     private val authorities = user.roles
@@ -39,4 +40,9 @@ class CustomUserDetails(user: User) : UserDetails {
     override fun isEnabled(): Boolean {
         return true
     }
+
+    fun getUserId(): Long {
+        return id
+    }
+
 }

@@ -20,6 +20,19 @@ class RestExceptionHandler {
 
     private val logger: Logger = LoggerFactory.getLogger(RestExceptionHandler::class.java)
 
+    @ExceptionHandler(IllegalAccessException::class)
+    fun handleIllegalAccessException(ex: IllegalAccessException): ResponseEntity<ErrorResponse> {
+        logger.warn("Illegal Access " + ex.message ?: "ex.stackTraceToString()")
+        val errorResponse = ErrorResponse(
+            timestamp = LocalDateTime.now(),
+            status = HttpStatus.FORBIDDEN.value(),
+            error = HttpStatus.FORBIDDEN.reasonPhrase,
+            message = ex.message ?: "Operation Not Allowed",
+            path = getRequestPath()
+        )
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationExceptions(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
         val errors = ex.bindingResult.fieldErrors.map { error ->

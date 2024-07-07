@@ -28,6 +28,14 @@ class UserRepositoryImpl(
         return userMapper.toModel(savedUserEntity)
     }
 
+    override fun getById(id: Long): User {
+        val userEntityOptional  = userRepository.findById(id)
+        val userEntity = userEntityOptional.orElseThrow {
+            throw NoSuchElementException("User with id $id not found")
+        }
+        return userMapper.toModel(userEntity)
+    }
+
     fun findByUsername(username: String): User? {
         val userEntity = userRepository.findByUsername(username)
         return if (userEntity.isPresent) {

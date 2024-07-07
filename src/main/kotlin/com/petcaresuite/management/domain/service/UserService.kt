@@ -2,14 +2,19 @@ package com.petcaresuite.management.domain.service
 
 import com.petcaresuite.management.infrastructure.security.JwtTokenService
 import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
+import com.petcaresuite.management.application.dto.ResponseDTO
 import com.petcaresuite.management.domain.model.RoleType
 import com.petcaresuite.management.application.dto.UserRegisterDTO
+import com.petcaresuite.management.application.dto.UserUpdateDTO
 import com.petcaresuite.management.application.port.input.IUserService
 import com.petcaresuite.management.domain.mapper.IUserDTOMapper
 import com.petcaresuite.management.domain.model.Role
 import com.petcaresuite.management.domain.repository.IUserRepository
+import com.petcaresuite.management.domain.valueobject.CustomUserDetails
 import com.petcaresuite.management.infrastructure.persistence.mapper.IRoleMapper
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaRoleRepository
+import com.petcaresuite.management.infrastructure.security.CustomUserDetailsService
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -36,6 +41,29 @@ class UserService(
         return AuthenticationResponseDTO(token = jwtToken)
     }
 
+    override fun update(userUpdateDTO: UserUpdateDTO): ResponseDTO {
+        validateUserUpdate(userUpdateDTO)
+        val user = userRepository.getById(userUpdateDTO.id!!)
+        userRepository.save(user)
+        return ResponseDTO.generateSuccessResponse(true, "User Updated")
+    }
+
+    private fun validateUserUpdate(userUpdateDTO: UserUpdateDTO) {
+        validateUpdatePermission(userUpdateDTO)
+        validateRoles(userUpdateDTO.roles)
+        validatePasswordComplexity(userUpdateDTO.password!!)
+        userUpdateDTO.password = encodePassword(userUpdateDTO.password!!)
+    }
+
+    private fun validateUpdatePermission(userUpdateDTO: UserUpdateDTO) {
+        // TODO: ALLOW COMPANY ADMIN TO CHANGE ANY USER
+        val currentUserId : CustomUserDetails = SecurityContextHolder.getContext().authentication.principal as CustomUserDetails
+        // Move authorithies and roles rules in a different server it would be n
+        if (currentUserId.getUserId() != userUpdateDTO.id && !SecurityContextHolder.getContext().authentication.authorities.any { it.authority == "SYSAD1MIN" }) {
+            throw IllegalAccessException("Unauthorized: Only Application Admins or the user themselves can update the user.")
+        }
+    }
+
     private fun validateUserRegistration(userRegisterDTO: UserRegisterDTO) {
         validateRoles(userRegisterDTO.roles)
         validatePasswordComplexity(userRegisterDTO.password!!)
@@ -54,6 +82,7 @@ class UserService(
             .takeIf { it.isPresent }
             ?.let { throw IllegalArgumentException("User $username already exists.") }
     }
+
 
     private fun retrieveRoles(userRegisterDTO: UserRegisterDTO): Set<Role> {
         return userRegisterDTO.roles?.mapNotNull { roleName ->
