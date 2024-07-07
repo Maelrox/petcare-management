@@ -2,7 +2,7 @@ package com.petcaresuite.management.domain.model
 
 import java.math.BigDecimal
 
-data class BillingDetails(
+data class BillingDetail(
     val detailId: Int?,
     val billingId: Int,
     val itemType: String,

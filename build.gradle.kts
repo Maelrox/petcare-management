@@ -4,7 +4,7 @@ plugins {
 	kotlin("jvm") version "1.9.24"
 	kotlin("plugin.spring") version "1.9.24"
 	kotlin("kapt") version "1.9.24"
-	kotlin("plugin.jpa") version "2.0.0"
+	kotlin("plugin.jpa") version "1.9.24"
 }
 
 group = "com.petcaresuite"
@@ -18,6 +18,10 @@ java {
 
 repositories {
 	mavenCentral()
+	// Shared Library
+	maven {
+		url = uri("file://${rootProject.projectDir}/../library-project/build/repos")
+	}
 }
 
 dependencies {
@@ -33,6 +37,8 @@ dependencies {
 
 	kapt ("org.mapstruct:mapstruct-processor:1.4.2.Final")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+	compileOnly("org.springframework.boot:spring-boot-devtools")
+	runtimeOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -48,4 +54,9 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+// Pass system properties to the bootRun task
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+	systemProperties = System.getProperties().mapKeys { it.key.toString() }
 }

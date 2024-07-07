@@ -1,12 +1,10 @@
-package com.petcaresuite.management.interfaces.rest.user
+package com.petcaresuite.management.interfaces.web.user
 
 import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
 import com.petcaresuite.management.application.dto.UserRegisterDTO
-import com.petcaresuite.management.application.service.IUserService
-import com.petcaresuite.management.domain.service.AuthenticationService
+import com.petcaresuite.management.application.port.input.IUserService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 

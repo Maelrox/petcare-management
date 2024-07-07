@@ -1,5 +1,6 @@
-package com.petcaresuite.management.domain.model
+package com.petcaresuite.management.domain.valueobject
 
+import com.petcaresuite.management.domain.model.User
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

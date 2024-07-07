@@ -4,9 +4,9 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import com.petcaresuite.management.application.dto.AuthenticationRequestDTO
-import com.petcaresuite.management.application.service.JwtTokenService
+import com.petcaresuite.management.infrastructure.security.JwtTokenService
 import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
-import com.petcaresuite.management.application.service.IAuthenticationService
+import com.petcaresuite.management.application.port.input.IAuthenticationService
 import com.petcaresuite.management.domain.repository.IUserRepository
 
 @Service

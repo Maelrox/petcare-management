@@ -1,6 +1,6 @@
 package com.petcaresuite.management.config
 
-import com.petcaresuite.management.application.service.JwtTokenService
+import com.petcaresuite.management.infrastructure.security.JwtTokenService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest

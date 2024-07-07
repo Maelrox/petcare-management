@@ -1,14 +1,11 @@
-package com.petcaresuite.management.infrastructure.persistence.repository
+package com.petcaresuite.management.infrastructure.persistence.adapter
 
 import com.petcaresuite.management.domain.model.Role
 import com.petcaresuite.management.domain.model.RoleType
-import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.domain.repository.IRoleRepository
-import com.petcaresuite.management.domain.repository.IUserRepository
 import com.petcaresuite.management.infrastructure.persistence.mapper.IRoleMapper
-import com.petcaresuite.management.infrastructure.persistence.mapper.IUserMapper
+import com.petcaresuite.management.infrastructure.persistence.repository.JpaRoleRepository
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class RoleRepositoryImpl(

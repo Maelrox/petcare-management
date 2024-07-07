@@ -32,10 +32,6 @@ class RestExceptionHandler {
             message = errors.joinToString(", "),
             path = getRequestPath()
         )
-        logger.trace("validation trace")
-        logger.debug("validation debug")
-        logger.warn("validation warning")
-        logger.error("validation error")
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
     }
 
@@ -53,6 +49,7 @@ class RestExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleGlobalException(ex: Exception): ResponseEntity<ErrorResponse> {
+        logger.error("Unhandled exception " + ex.message ?: "ex.stackTraceToString()")
         val errorResponse = ErrorResponse(
             status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
             error = "Internal Server Error",
@@ -64,8 +61,8 @@ class RestExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException::class)
     fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException): ResponseEntity<ErrorResponse> {
+        logger.error("Unhandled exception " + ex.message ?: "ex.stackTraceToString()")
         val errorMessage = generateUserFriendlyErrorMessage(ex)
-
         val errorResponse = ErrorResponse(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.BAD_REQUEST.value(),

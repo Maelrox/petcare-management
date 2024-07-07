@@ -1,10 +1,10 @@
 package com.petcaresuite.management.domain.service
 
-import com.petcaresuite.management.application.service.JwtTokenService
+import com.petcaresuite.management.infrastructure.security.JwtTokenService
 import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
 import com.petcaresuite.management.domain.model.RoleType
 import com.petcaresuite.management.application.dto.UserRegisterDTO
-import com.petcaresuite.management.application.service.IUserService
+import com.petcaresuite.management.application.port.input.IUserService
 import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.domain.repository.IUserRepository
 import com.petcaresuite.management.infrastructure.persistence.mapper.IRoleMapper
@@ -51,13 +51,9 @@ class UserService(
             lastModified = LocalDateTime.now()
         )
 
-        // Persisting changes
         userRepository.save(user)
-
-        // Generate token
         val jwtToken = jwtTokenService.generateToken(user.username)
 
-        // Return response
         return AuthenticationResponseDTO(token = jwtToken)
     }
 

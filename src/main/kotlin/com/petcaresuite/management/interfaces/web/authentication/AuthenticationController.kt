@@ -1,8 +1,8 @@
-package com.petcaresuite.management.interfaces.rest.authentication
+package com.petcaresuite.management.interfaces.web.authentication
 
 import com.petcaresuite.management.application.dto.AuthenticationRequestDTO
 import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
-import com.petcaresuite.management.application.service.IAuthenticationService
+import com.petcaresuite.management.application.port.input.IAuthenticationService
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*

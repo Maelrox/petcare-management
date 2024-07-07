@@ -1,4 +1,4 @@
-package com.petcaresuite.management.application.service
+package com.petcaresuite.management.infrastructure.security
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts

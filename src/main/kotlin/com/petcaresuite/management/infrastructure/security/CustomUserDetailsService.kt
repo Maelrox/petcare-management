@@ -1,6 +1,6 @@
-package com.petcaresuite.management.application.service
+package com.petcaresuite.management.infrastructure.security
 
-import com.petcaresuite.management.domain.model.CustomUserDetails
+import com.petcaresuite.management.domain.valueobject.CustomUserDetails
 import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.domain.repository.IUserRepository
 import org.springframework.security.core.userdetails.UserDetails
