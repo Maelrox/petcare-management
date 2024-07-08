@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 @Service
 class LoginAttemptService (
     private val request: HttpServletRequest
-) : ILoginAttemptService {
+) : LoginAttemptUseCase {
     companion object {
         const val MAX_ATTEMPT = 10
         private val logger = LoggerFactory.getLogger(LoginAttemptService::class.java)

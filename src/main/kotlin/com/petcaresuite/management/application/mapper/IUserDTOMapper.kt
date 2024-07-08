@@ -1,4 +1,4 @@
-package com.petcaresuite.management.domain.mapper
+package com.petcaresuite.management.application.mapper
 
 import com.petcaresuite.management.application.dto.UserDetailsDTO
 import com.petcaresuite.management.application.dto.UserRegisterDTO

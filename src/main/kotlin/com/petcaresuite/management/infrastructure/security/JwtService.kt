@@ -1,5 +1,6 @@
 package com.petcaresuite.management.infrastructure.security
 
+import com.petcaresuite.management.application.port.output.JwtPort
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
@@ -12,24 +13,26 @@ import java.util.*
 import javax.crypto.SecretKey
 
 @Component
-class JwtService {
+class JwtService : JwtPort {
 
     @Value("\${jwt.secret.key}")
     lateinit var secret: String
 
-    fun generateToken(username: String): String {
+    override fun generateToken(username: String): Pair<String, Date> {
         val claims = HashMap<String, Any>()
         return createToken(claims, username)
     }
 
-    private fun createToken(claims: Map<String, Any>, username: String): String {
-        return Jwts.builder()
+    private fun createToken(claims: Map<String, Any>, username: String): Pair<String, Date> {
+        val expirationDate = Date(System.currentTimeMillis() + 1000 * 60 * 30)
+        val token = Jwts.builder()
             .claims(claims)
             .subject(username)
             .issuedAt(Date(System.currentTimeMillis()))
-            .expiration(Date(System.currentTimeMillis() + 1000 * 60 * 30))
+            .expiration(expirationDate)
             .signWith(getSignKey(), Jwts.SIG.HS256)
             .compact()
+        return Pair(token, expirationDate)
     }
 
     private fun getSignKey(): SecretKey? {
@@ -37,16 +40,12 @@ class JwtService {
         return Keys.hmacShaKeyFor(keyBytes)
     }
 
-    fun extractUsername(token: String): String {
+    override fun extractUsername(token: String): String {
         return extractClaim(token, Claims::getSubject)
     }
 
     fun extractExpiration(token: String): Date {
         return extractClaim(token, Claims::getExpiration)
-    }
-
-    interface ClaimExtractor<T> {
-        fun extract(claims: Claims): T
     }
 
     private inline fun <reified T> extractClaim(token: String, claimsResolver: (Claims) -> T): T {
@@ -71,7 +70,7 @@ class JwtService {
         return extractExpiration(token).before(Date())
     }
 
-    fun validateToken(token: String, userDetails: UserDetails): Boolean {
+    override fun validateToken(token: String, userDetails: UserDetails): Boolean {
         try {
             val username = extractUsername(token)
             return username == userDetails.username && !isTokenExpired(token)

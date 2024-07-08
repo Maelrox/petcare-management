@@ -1,7 +1,7 @@
 package com.petcaresuite.management.infrastructure.persistence.adapter
 
+import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.domain.model.User
-import com.petcaresuite.management.domain.repository.IUserRepository
 import com.petcaresuite.management.infrastructure.persistence.mapper.IUserMapper
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaUserRepository
 import org.springframework.stereotype.Component
@@ -11,7 +11,7 @@ import java.util.Optional
 class UserRepositoryImpl(
     private val userRepository: JpaUserRepository,
     private val userMapper: IUserMapper
-) : IUserRepository {
+) : UserPersistencePort {
     override fun getUserInfoByUsername(username: String): Optional<User> {
         val userEntity = userRepository.findByUsername(username.trim())
         return if (userEntity.isPresent) {

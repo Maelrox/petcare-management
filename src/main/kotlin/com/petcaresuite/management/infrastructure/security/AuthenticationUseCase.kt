@@ -5,17 +5,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service
 import com.petcaresuite.management.application.dto.AuthenticationRequestDTO
 import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
-import com.petcaresuite.management.application.security.IAuthenticationService
-import com.petcaresuite.management.application.security.ILoginAttemptService
-import com.petcaresuite.management.domain.repository.IUserRepository
+import com.petcaresuite.management.application.port.output.UserPersistencePort
+import com.petcaresuite.management.application.security.AuthenticationUseCase
+import com.petcaresuite.management.application.security.LoginAttemptUseCase
+import com.petcaresuite.management.application.mapper.IUserDTOMapper
 
 @Service
-class AuthenticationService(
-    private val userRepository: IUserRepository,
+class AuthenticationUseCase(
+    private val userRepository: UserPersistencePort,
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
-    private val loggingAttemptService: ILoginAttemptService
-) : IAuthenticationService {
+    private val loggingAttemptService: LoginAttemptUseCase,
+    private val userMapper: IUserDTOMapper,
+    ) : AuthenticationUseCase {
 
     override fun authenticate(request: AuthenticationRequestDTO): AuthenticationResponseDTO {
         if (loggingAttemptService.isBlocked()) {
@@ -27,7 +29,12 @@ class AuthenticationService(
             )
         )
         val user = userRepository.getUserInfoByUsername(request.userName.toString()).orElseThrow()
-        val jwtToken = jwtService.generateToken(user.username)
-        return AuthenticationResponseDTO(token = jwtToken)
+        val (jwtToken, expirationDate) = jwtService.generateToken(user.username)
+        val userDetailsDTO = userMapper.toUserDetailsDTO(user)
+        return AuthenticationResponseDTO(
+            token = jwtToken,
+            expirationDate = expirationDate,
+            userDetailsDTO = userDetailsDTO
+        )
     }
 }
