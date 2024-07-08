@@ -1,6 +1,7 @@
-package com.petcaresuite.management.config
+package com.petcaresuite.management.infrastructure.config
 
-import com.petcaresuite.management.infrastructure.security.CustomUserDetailsService
+import com.petcaresuite.management.infrastructure.security.UserDetailsService
+import com.petcaresuite.management.infrastructure.security.JwtAuthFilter
 import jakarta.servlet.DispatcherType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -22,7 +23,7 @@ import org.springframework.security.web.util.matcher.DispatcherTypeRequestMatche
 @EnableWebSecurity
 class SecurityConfig(
     private val authFilter: JwtAuthFilter,
-    private val customUserDetailsService: CustomUserDetailsService,
+    private val customUserDetailsService: UserDetailsService,
     )  {
 
     @Bean

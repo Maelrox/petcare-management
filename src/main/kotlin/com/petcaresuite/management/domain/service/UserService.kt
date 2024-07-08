@@ -1,7 +1,7 @@
 package com.petcaresuite.management.domain.service
 
 import com.petcaresuite.management.application.dto.*
-import com.petcaresuite.management.infrastructure.security.JwtTokenService
+import com.petcaresuite.management.infrastructure.security.JwtService
 import com.petcaresuite.management.domain.model.RoleType
 import com.petcaresuite.management.application.port.input.IUserService
 import com.petcaresuite.management.domain.mapper.IUserDTOMapper
@@ -11,10 +11,7 @@ import com.petcaresuite.management.domain.repository.IUserRepository
 import com.petcaresuite.management.domain.valueobject.CustomUserDetails
 import com.petcaresuite.management.infrastructure.persistence.mapper.IRoleMapper
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaRoleRepository
-import com.petcaresuite.management.infrastructure.security.CustomUserDetailsService
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -25,11 +22,11 @@ private const val PASSWORD_REGEX = """^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Z
 class UserService(
     private val userRepository: IUserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtTokenService: JwtTokenService,
+    private val jwtTokenService: JwtService,
     private val roleRepository: JpaRoleRepository,
     private val roleMapper: IRoleMapper,
     private val userMapper: IUserDTOMapper,
-    private val customUserDetailsService: CustomUserDetailsService
+    private val customUserDetailsService: com.petcaresuite.management.infrastructure.security.UserDetailsService
     ) : IUserService {
 
 

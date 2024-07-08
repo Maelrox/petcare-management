@@ -34,7 +34,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
 	implementation("org.mapstruct:mapstruct:1.6.0.Beta2")
 	implementation("jakarta.validation:jakarta.validation-api:3.1.0")
-
+	implementation("com.google.guava:guava:33.2.1-jre")
 	kapt ("org.mapstruct:mapstruct-processor:1.4.2.Final")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 	compileOnly("org.springframework.boot:spring-boot-devtools")

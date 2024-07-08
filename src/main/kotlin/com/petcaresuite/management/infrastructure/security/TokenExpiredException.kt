@@ -1,3 +1,3 @@
-package com.petcaresuite.management.config
+package com.petcaresuite.management.infrastructure.security
 
 class TokenExpiredException(message: String) : RuntimeException(message)

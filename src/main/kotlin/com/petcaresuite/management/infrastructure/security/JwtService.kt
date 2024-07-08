@@ -1,6 +1,5 @@
 package com.petcaresuite.management.infrastructure.security
 
-import com.petcaresuite.management.config.TokenExpiredException
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
@@ -13,7 +12,7 @@ import java.util.*
 import javax.crypto.SecretKey
 
 @Component
-class JwtTokenService {
+class JwtService {
 
     @Value("\${jwt.secret.key}")
     lateinit var secret: String

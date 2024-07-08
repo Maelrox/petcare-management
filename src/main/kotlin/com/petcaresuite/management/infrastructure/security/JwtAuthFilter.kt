@@ -1,8 +1,7 @@
-package com.petcaresuite.management.config
+package com.petcaresuite.management.infrastructure.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.petcaresuite.management.application.dto.ErrorResponse
-import com.petcaresuite.management.infrastructure.security.JwtTokenService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
@@ -20,7 +19,7 @@ import java.time.LocalDateTime
 
 @Component
 class JwtAuthFilter(
-    private val jwtService: JwtTokenService,
+    private val jwtService: JwtService,
     private val userDetailsService: UserDetailsService,
     private val objectMapper: ObjectMapper
 ) : OncePerRequestFilter() {

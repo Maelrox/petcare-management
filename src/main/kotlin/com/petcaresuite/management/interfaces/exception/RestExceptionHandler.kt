@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -28,6 +29,18 @@ class RestExceptionHandler {
             status = HttpStatus.UNAUTHORIZED.value(),
             error = HttpStatus.UNAUTHORIZED.reasonPhrase,
             message = ex.message ?: "Token Expired",
+            path = getRequestPath()
+        )
+        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+    }
+
+    @ExceptionHandler(BadCredentialsException::class)
+    fun handleBadCredentialsException(ex: BadCredentialsException): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse(
+            timestamp = LocalDateTime.now(),
+            status = HttpStatus.UNAUTHORIZED.value(),
+            error = HttpStatus.UNAUTHORIZED.reasonPhrase,
+            message = ex.message ?: "Username/Password Invalid",
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
