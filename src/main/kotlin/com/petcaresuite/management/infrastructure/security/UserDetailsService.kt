@@ -13,13 +13,13 @@ import java.util.*
 @Service
 class UserDetailsService(
     private val userRepository: IUserRepository,
-    private val loginAttemptService: ILoginAttemptService
+    private val loginAttemptAdapter: LoginAttemptAdapter
 ) :
     UserDetailsService {
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
-        if (loginAttemptService.isBlocked()) {
+        if (loginAttemptAdapter.isBlocked()) {
             throw IllegalAccessException("Too many attempts wait 24 hours");
         }
         val user: Optional<User> = userRepository.getUserInfoByUsername(username)
