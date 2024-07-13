@@ -28,8 +28,8 @@ class CompanyValidationService(
         }
     }
 
-    fun validateUserCompanyAccess(user: User, companyIdentification: String) {
-        if (companyIdentification == user.company?.companyIdentification) {
+    fun validateUserCompanyAccess(user: User, id: Long) {
+        if (id != user.company?.id) {
             throw IllegalAccessException(Responses.USER_IS_NOT_MEMBER_OF_COMPANY)
         }
     }

@@ -6,5 +6,6 @@ interface CompanyPersistencePort {
     fun save(company: Company): Company
     fun findCompanyByIdentification(id: String): Company?
     fun findCompanyByName(companyName: String): Company?
+    fun findById(id: Long): Company?
 
 }

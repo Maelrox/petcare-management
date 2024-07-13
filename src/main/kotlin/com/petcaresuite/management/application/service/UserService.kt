@@ -19,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-
 @Service
 class UserService(
     private val userValidationService: UserValidationService,
@@ -58,7 +57,7 @@ class UserService(
 
     override fun getByUserName(username: String): User {
         return userPersistencePort.getUserInfoByUsername(username)
-            .orElseThrow{ IllegalArgumentException(Responses.USER_NOT_VALID)}
+            .orElseThrow { IllegalArgumentException(Responses.USER_NOT_VALID) }
     }
 
     override fun getByToken(token: String): UserDetailsDTO {

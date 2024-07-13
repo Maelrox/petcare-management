@@ -27,4 +27,9 @@ class CompanyRepositoryAdapter(
         return companyEntityOptional.orElse(null)?.let { companyMapper.toDomain(it) }
     }
 
+    override fun findById(id: Long): Company? {
+        val companyEntityOptional = companyRepository.findById(id)
+        return companyEntityOptional.orElse(null)?.let { companyMapper.toDomain(it) }
+    }
+
 }

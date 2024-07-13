@@ -6,6 +6,7 @@ import com.petcaresuite.management.application.port.input.CompanyUseCase
 import com.petcaresuite.management.application.port.output.CompanyPersistencePort
 import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
+import com.petcaresuite.management.domain.model.Company
 import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.domain.service.CompanyValidationService
 import jakarta.transaction.Transactional
@@ -32,12 +33,13 @@ class CompanyService(
     }
 
     @Transactional
-    override fun update(companyDTO: CompanyDTO): ResponseDTO {
+    override fun update(companyDTO: CompanyDTO, companyId: Long): ResponseDTO {
         val user = userService.getCurrentUser()
-        validateUpdate(companyDTO, user)
-        val company = companyMapper.toDomain(companyDTO)
-        val persistedCompany = companyPersistencePort.save(company)
-        user.company = persistedCompany
+        val company = companyPersistencePort.findById(companyId)
+            ?: throw IllegalArgumentException(Responses.COMPANY_IDENTIFICATION_DOESNT_EXIST.format(companyId))
+        validateUpdate(companyDTO, user, company, companyId)
+        val updatableCompany = setUpdatableFields(companyDTO, company)
+        companyPersistencePort.save(updatableCompany)
         return ResponseDTO(Responses.COMPANY_UPDATED)
     }
 
@@ -47,10 +49,24 @@ class CompanyService(
         companyValidationService.validateCompanyIdentification(companyDTO.companyIdentification)
     }
 
-    fun validateUpdate(companyDTO: CompanyDTO, user: User) {
-        companyValidationService.validateUserCompanyAccess(user, companyDTO.companyIdentification)
-        companyValidationService.validateName(companyDTO.name)
-        companyValidationService.validateCompanyIdentification(companyDTO.companyIdentification)
+    fun validateUpdate(companyDTO: CompanyDTO, user: User, company: Company, companyId: Long) {
+        companyValidationService.validateUserCompanyAccess(user, companyId)
+        if (company.name != companyDTO.name) {
+            companyValidationService.validateName(companyDTO.name)
+        }
+        if (company.companyIdentification != companyDTO.companyIdentification) {
+            companyValidationService.validateCompanyIdentification(companyDTO.companyIdentification)
+        }
+    }
+
+    private fun setUpdatableFields(companyDTO: CompanyDTO, company: Company): Company {
+        return Company(
+            companyIdentification = companyDTO.companyIdentification,
+            id =  company.id,
+            name = companyDTO.name,
+            users =  ArrayList(),
+            country = companyDTO.country
+        )
     }
 
 }

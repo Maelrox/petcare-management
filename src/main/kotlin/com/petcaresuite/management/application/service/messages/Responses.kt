@@ -15,6 +15,7 @@ object Responses {
     const val COMPANY_UPDATED = "The company has been updated"
     const val COMPANY_NAME_ALREADY_EXIST = "Company with name %s already exists"
     const val COMPANY_IDENTIFICATION_ALREADY_EXIST = "Company with identification %s already exists"
+    const val COMPANY_IDENTIFICATION_DOESNT_EXIST = "Company with identification %s doesn't exists"
     const val USER_IS_MEMBER_OF_ANOTHER_COMPANY = "You are already member of a company"
     const val USER_IS_NOT_MEMBER_OF_COMPANY = "You are not a member of this company"
 
