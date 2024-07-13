@@ -62,7 +62,7 @@ class UserService(
     }
 
     override fun getByToken(token: String): UserDetailsDTO {
-        val username = jwtPort.extractUsername(token);
+        val username = jwtPort.extractUsername(token)
         val userDetails = userDetailsService.loadUserByUsername(username)
         jwtPort.validateToken(token, userDetails)
         val user = getUserByUserName(username)
@@ -84,7 +84,7 @@ class UserService(
     private fun retrieveRoles(roles: Set<String>): Set<Role> {
         return roles.mapNotNull { roleName ->
             rolePersistencePort.findByName(RoleType.valueOf(roleName))
-        }?.toSet() ?: emptySet()
+        }.toSet()
     }
 
     private fun setUpdatableFields(userUpdateDTO: UserUpdateDTO, user: User) {
