@@ -23,7 +23,7 @@ class CompanyValidationService(
     }
 
     fun validateUserCompanyExistence(user: User) {
-        if (user?.company != null) {
+        if (user.company != null) {
             throw IllegalArgumentException(Responses.USER_IS_MEMBER_OF_ANOTHER_COMPANY)
         }
     }

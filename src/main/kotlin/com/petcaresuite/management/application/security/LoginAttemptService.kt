@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit
 import com.petcaresuite.management.application.service.messages.InternalErrors
 
 @Service
+@SuppressWarnings("unused")
 class LoginAttemptService (
     private val request: HttpServletRequest
 ) : LoginAttemptUseCase {

@@ -1,6 +1,8 @@
 package com.petcaresuite.management.interfaces.exception
 
 import com.petcaresuite.management.application.dto.ErrorResponseDTO
+import com.petcaresuite.management.application.service.messages.InternalErrors
+import com.petcaresuite.management.application.service.messages.Responses
 import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -28,7 +30,7 @@ class RestExceptionHandler {
             timestamp = LocalDateTime.now(),
             status = HttpStatus.UNAUTHORIZED.value(),
             error = HttpStatus.UNAUTHORIZED.reasonPhrase,
-            message = ex.message ?: "Token Expired",
+            message = ex.message ?: Responses.TOKEN_EXPIRED,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
@@ -40,7 +42,7 @@ class RestExceptionHandler {
             timestamp = LocalDateTime.now(),
             status = HttpStatus.UNAUTHORIZED.value(),
             error = HttpStatus.UNAUTHORIZED.reasonPhrase,
-            message = ex.message ?: "Username/Password Invalid",
+            message = ex.message ?: Responses.USER_NAME_OR_PASSWORD_INVALID,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
@@ -48,12 +50,12 @@ class RestExceptionHandler {
 
     @ExceptionHandler(IllegalAccessException::class)
     fun handleIllegalAccessException(ex: IllegalAccessException): ResponseEntity<ErrorResponseDTO> {
-        logger.warn("Illegal Access " + ex.message ?: "ex.stackTraceToString()")
+        logger.warn(InternalErrors.ILLEGAL_ACCESS.format(ex.message))
         val errorResponse = ErrorResponseDTO(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.FORBIDDEN.value(),
             error = HttpStatus.FORBIDDEN.reasonPhrase,
-            message = ex.message ?: "Operation Not Allowed",
+            message = ex.message ?: Responses.OPERATION_NOT_ALLOWED,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
@@ -80,7 +82,7 @@ class RestExceptionHandler {
             timestamp = LocalDateTime.now(),
             status = HttpStatus.BAD_REQUEST.value(),
             error = HttpStatus.BAD_REQUEST.reasonPhrase,
-            message = ex.message ?: "Malformed JSON request",
+            message = ex.message ?: Responses.MALFORMED_JSON,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
@@ -88,11 +90,11 @@ class RestExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleGlobalException(ex: Exception): ResponseEntity<ErrorResponseDTO> {
-        logger.error("Unhandled exception " + ex.message ?: "ex.stackTraceToString()")
+        logger.error(InternalErrors.UNHANDLED_EXCEPTION.format(ex.message))
         val errorResponseDTO = ErrorResponseDTO(
             status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            error = "Internal Server Error",
-            message = ex.message ?: "Undefined error",
+            error = HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
+            message = ex.message ?: InternalErrors.UNHANDLED_EXCEPTION,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponseDTO.status).body(errorResponseDTO)
@@ -100,7 +102,7 @@ class RestExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException::class)
     fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException): ResponseEntity<ErrorResponseDTO> {
-        logger.error("Unhandled exception " + ex.message ?: "ex.stackTraceToString()")
+        logger.error(InternalErrors.UNHANDLED_EXCEPTION.format(ex.message))
         val errorMessage = generateUserFriendlyErrorMessage(ex)
         val errorResponseDTO = ErrorResponseDTO(
             timestamp = LocalDateTime.now(),
@@ -119,13 +121,13 @@ class RestExceptionHandler {
             cause is ConstraintViolationException -> {
                 when {
                     cause.message?.contains("not-null", ignoreCase = true) == true ->
-                        "A required field was left empty. Please fill in all required fields."
+                        Responses.REQUIRED_FIELD_MISSING
                     cause.message?.contains("unique", ignoreCase = true) == true ->
-                        "A duplicate entry was detected. Please ensure all fields are unique where required."
-                    else -> "There was an issue with the data you provided. Please check your input and try again."
+                        Responses.DUPLICATE_ENTRY
+                    else -> Responses.PERSISTENCE_ERROR
                 }
             }
-            else -> "An unexpected error occurred. Please try again or contact support if the problem persists."
+            else -> Responses.GENERIC_ERROR
         }
     }
 
