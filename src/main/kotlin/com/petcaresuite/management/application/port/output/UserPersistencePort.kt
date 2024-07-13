@@ -7,4 +7,6 @@ interface UserPersistencePort {
     fun getUserInfoByUsername(username: String): Optional<User>
     fun save(user: User): User
     fun getById(id: Long): User
+
+    fun findByUsername(username: String): User?
 }

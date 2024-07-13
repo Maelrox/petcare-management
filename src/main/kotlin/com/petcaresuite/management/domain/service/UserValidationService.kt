@@ -4,6 +4,7 @@ import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.domain.model.RoleType
 import com.petcaresuite.management.application.port.output.RolePersistencePort
 import com.petcaresuite.management.application.port.output.UserPersistencePort
+import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.valueobject.CustomUserDetails
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -12,35 +13,36 @@ private const val PASSWORD_REGEX = """^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Z
 
 @Service
 class UserValidationService(
-    private val userRepository: UserPersistencePort,
-    private val roleRepository: RolePersistencePort,
-)  {
+    private val userPersistencePort: UserPersistencePort,
+    private val rolePersistencePort: RolePersistencePort,
+) {
 
     fun validateUpdatePermission(userUpdateDTO: UserUpdateDTO) {
-        // TODO: ALLOW COMPANY ADMIN TO CHANGE ANY USER
+        // TODO: ALLOW COMPANY ADMIN TO UPDATE ANY USER OF THE SAME COMPANY
         val currentUserId: CustomUserDetails =
             SecurityContextHolder.getContext().authentication.principal as CustomUserDetails
         // TODO: Context shouldn't depend of a single server
-        if (currentUserId.getUserId() != userUpdateDTO.id && !SecurityContextHolder.getContext().authentication.authorities.any { it.authority == "SYSADMIN" }) {
-            throw IllegalAccessException("Unauthorized: Only Application Admins or the user themselves can update the user.")
+        if (currentUserId.getUserId() != userUpdateDTO.id && !SecurityContextHolder.getContext().authentication.authorities.any { it.authority == RoleType.SYSADMIN.toString() }) {
+            throw IllegalAccessException(Responses.USER_UPDATE_NOT_ALLOWED)
         }
     }
 
     fun validateRoles(roles: Set<String>?) {
         roles?.forEach { roleName ->
-            roleRepository.findByName(RoleType.valueOf(roleName))
-                ?: throw IllegalArgumentException("Role not found: $roleName")
+            rolePersistencePort.findByName(RoleType.valueOf(roleName))
+                ?: throw IllegalArgumentException(Responses.ROLE_NOT_FOUND.format(roleName))
         }
     }
 
     fun validateUserDoesNotExist(username: String) {
-        userRepository.getUserInfoByUsername(username).takeIf { it.isPresent }
-            ?.let { throw IllegalArgumentException("User $username already exists.") }
+        userPersistencePort.getUserInfoByUsername(username).takeIf { it.isPresent }
+            ?.let { throw IllegalArgumentException(Responses.USER_ALREADY_EXISTS.format(username)) }
     }
+
     fun validatePasswordComplexity(password: String) {
         val passwordRegex = Regex(PASSWORD_REGEX)
         if (!password.matches(passwordRegex)) {
-            throw IllegalArgumentException("Password must be at least 8 characters long and contain at least one digit, one lowercase letter, one uppercase letter and one special character.")
+            throw IllegalArgumentException(Responses.USER_PASSWORD_NOT_VALID)
         }
     }
 

@@ -5,8 +5,8 @@ import com.petcaresuite.management.infrastructure.persistence.entity.RoleEntity
 import org.mapstruct.Mapper
 
 @Mapper(componentModel = "spring")
-interface IRoleMapper {
+interface RoleEntityMapper {
     fun toEntity(roleModel: Role): RoleEntity
 
-    fun toModel(roleEntity: RoleEntity): Role
+    fun toDomain(roleEntity: RoleEntity): Role
 }

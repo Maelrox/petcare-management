@@ -1,7 +1,7 @@
 package com.petcaresuite.management.infrastructure.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.petcaresuite.management.application.dto.ErrorResponse
+import com.petcaresuite.management.application.dto.ErrorResponseDTO
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
@@ -51,7 +51,7 @@ class JwtAuthFilter(
             }
             filterChain.doFilter(request, response)
         } catch (ex: TokenExpiredException) {
-            val errorResponse = ErrorResponse(
+            val errorResponse = ErrorResponseDTO(
                 timestamp = LocalDateTime.now(),
                 status = HttpStatus.UNAUTHORIZED.value(),
                 error = HttpStatus.UNAUTHORIZED.reasonPhrase,

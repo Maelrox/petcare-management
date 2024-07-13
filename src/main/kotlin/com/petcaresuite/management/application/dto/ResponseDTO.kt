@@ -4,6 +4,8 @@ data class ResponseDTO(
     val success: Boolean?,
     val message: String?,
 ) {
+    constructor(message: String) : this(true, message)
+
     companion object {
         fun generateSuccessResponse(isSuccess: Boolean, message: String): ResponseDTO {
             return ResponseDTO(

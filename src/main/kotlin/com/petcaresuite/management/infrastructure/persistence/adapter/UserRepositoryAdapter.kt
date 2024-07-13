@@ -2,20 +2,20 @@ package com.petcaresuite.management.infrastructure.persistence.adapter
 
 import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.domain.model.User
-import com.petcaresuite.management.infrastructure.persistence.mapper.IUserMapper
+import com.petcaresuite.management.infrastructure.persistence.mapper.UserEntityMapper
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaUserRepository
 import org.springframework.stereotype.Component
 import java.util.Optional
 
 @Component
-class UserRepositoryImpl(
+class UserRepositoryAdapter(
     private val userRepository: JpaUserRepository,
-    private val userMapper: IUserMapper
+    private val userMapper: UserEntityMapper
 ) : UserPersistencePort {
     override fun getUserInfoByUsername(username: String): Optional<User> {
         val userEntity = userRepository.findByUsername(username.trim())
         return if (userEntity.isPresent) {
-            val user = userMapper.toModel(userEntity.get())
+            val user = userMapper.toDomain(userEntity.get())
             Optional.of(user)
         } else {
             Optional.empty()
@@ -25,7 +25,7 @@ class UserRepositoryImpl(
     override fun save(user: User): User {
         val userEntity = userMapper.toEntity(user)
         val savedUserEntity = userRepository.save(userEntity)
-        return userMapper.toModel(savedUserEntity)
+        return userMapper.toDomain(savedUserEntity)
     }
 
     override fun getById(id: Long): User {
@@ -33,13 +33,13 @@ class UserRepositoryImpl(
         val userEntity = userEntityOptional.orElseThrow {
             throw NoSuchElementException("User with id $id not found")
         }
-        return userMapper.toModel(userEntity)
+        return userMapper.toDomain(userEntity)
     }
 
-    fun findByUsername(username: String): User? {
+    override fun findByUsername(username: String): User? {
         val userEntity = userRepository.findByUsername(username)
         return if (userEntity.isPresent) {
-            userMapper.toModel(userEntity.get())
+            userMapper.toDomain(userEntity.get())
         } else {
             null
         }

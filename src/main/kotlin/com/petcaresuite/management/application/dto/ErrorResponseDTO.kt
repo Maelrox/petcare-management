@@ -2,7 +2,7 @@ package com.petcaresuite.management.application.dto
 
 import java.time.LocalDateTime
 
-data class ErrorResponse(
+data class ErrorResponseDTO(
     val timestamp: LocalDateTime = LocalDateTime.now(),
     val status: Int,
     val error: String,

@@ -1,27 +1,32 @@
 package com.petcaresuite.management.application.service
 
 import com.petcaresuite.management.application.dto.*
+import com.petcaresuite.management.application.mapper.UserMapper
 import com.petcaresuite.management.application.port.input.UserUseCase
 import com.petcaresuite.management.application.port.output.JwtPort
-import com.petcaresuite.management.application.mapper.IUserDTOMapper
+import com.petcaresuite.management.application.port.output.RolePersistencePort
+import com.petcaresuite.management.application.port.output.UserPersistencePort
+import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.model.Role
 import com.petcaresuite.management.domain.model.RoleType
 import com.petcaresuite.management.domain.model.User
-import com.petcaresuite.management.application.port.output.RolePersistencePort
-import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.domain.service.UserValidationService
 import com.petcaresuite.management.infrastructure.security.UserDetailsService
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
+
 @Service
 class UserService(
     private val userValidationService: UserValidationService,
-    private val roleRepository: RolePersistencePort,
-    private val userRepository: UserPersistencePort,
+    private val rolePersistencePort: RolePersistencePort,
+    private val userPersistencePort: UserPersistencePort,
     private val passwordEncoder: PasswordEncoder,
-    private val userMapper: IUserDTOMapper,
+    private val userMapper: UserMapper,
     private val jwtPort: JwtPort,
     private val userDetailsService: UserDetailsService,
 ) :
@@ -30,11 +35,12 @@ class UserService(
         validateUserRegistration(userRegisterDTO)
         val roles = retrieveRoles(userRegisterDTO.roles!!)
         userRegisterDTO.password = passwordEncoder.encode(userRegisterDTO.password!!)
-        val user = userMapper.toUser(userRegisterDTO, roles)
-        userRepository.save(user)
-        val userDetailsDTO = userMapper.toUserDetailsDTO(user)
+        val user = userMapper.toDomain(userRegisterDTO, roles)
+        userPersistencePort.save(user)
+        val userDetailsDTO = userMapper.toDTO(user)
         val (jwtToken, expirationDate) = jwtPort.generateToken(user.username)
         return AuthenticationResponseDTO(
+            message = Responses.USER_CREATED,
             token = jwtToken,
             expirationDate = expirationDate,
             userDetailsDTO = userDetailsDTO
@@ -43,11 +49,16 @@ class UserService(
 
     override fun update(userUpdateDTO: UserUpdateDTO): ResponseDTO {
         validateUserUpdate(userUpdateDTO)
-        val user = userRepository.getById(userUpdateDTO.id!!)
+        val user = userPersistencePort.getById(userUpdateDTO.id!!)
         userUpdateDTO.password = passwordEncoder.encode(userUpdateDTO.password!!)
         setUpdatableFields(userUpdateDTO, user)
-        userRepository.save(user)
-        return ResponseDTO.generateSuccessResponse(true, "User Updated")
+        userPersistencePort.save(user)
+        return ResponseDTO.generateSuccessResponse(true, Responses.USER_UPDATED)
+    }
+
+    override fun getByUserName(username: String): User {
+        return userPersistencePort.getUserInfoByUsername(username)
+            .orElseThrow{ IllegalArgumentException(Responses.USER_NOT_VALID)}
     }
 
     override fun getByToken(token: String): UserDetailsDTO {
@@ -55,7 +66,7 @@ class UserService(
         val userDetails = userDetailsService.loadUserByUsername(username)
         jwtPort.validateToken(token, userDetails)
         val user = getUserByUserName(username)
-        return userMapper.toUserDetailsDTO(user)
+        return userMapper.toDTO(user)
     }
 
     private fun validateUserRegistration(userRegisterDTO: UserRegisterDTO) {
@@ -72,7 +83,7 @@ class UserService(
 
     private fun retrieveRoles(roles: Set<String>): Set<Role> {
         return roles.mapNotNull { roleName ->
-            roleRepository.findByName(RoleType.valueOf(roleName))
+            rolePersistencePort.findByName(RoleType.valueOf(roleName))
         }?.toSet() ?: emptySet()
     }
 
@@ -86,7 +97,25 @@ class UserService(
     }
 
     private fun getUserByUserName(username: String): User {
-        return userRepository.getUserInfoByUsername(username).get()
+        return userPersistencePort.getUserInfoByUsername(username).get()
+    }
+
+    fun getCurrentUsername(): String? {
+        val authentication: Authentication? = SecurityContextHolder.getContext().authentication
+        if (authentication != null && authentication.isAuthenticated) {
+            val principal: Any = authentication.principal
+            return if (principal is UserDetails) {
+                (principal).username
+            } else {
+                principal.toString()
+            }
+        }
+        return null
+    }
+
+    fun getCurrentUser(): User {
+        val userName = getCurrentUsername() ?: throw IllegalAccessException(Responses.USER_NOT_VALID)
+        return getByUserName(userName)
     }
 
 }

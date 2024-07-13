@@ -13,6 +13,6 @@
         var enabled: Boolean,
         var lastModified: LocalDateTime?,
         val createdDate: LocalDateTime,
-        val company: Company?,
+        var company: Company?,
         var roles: Set<Role>
     )

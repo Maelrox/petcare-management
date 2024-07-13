@@ -1,4 +1,4 @@
-package com.petcaresuite.management.interfaces.web.user
+package com.petcaresuite.management.interfaces.web
 
 import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.application.port.input.UserUseCase

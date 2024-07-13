@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import com.petcaresuite.management.application.service.messages.InternalErrors
 
 @Service
 class LoginAttemptService (
@@ -39,7 +40,7 @@ class LoginAttemptService (
         val ip = attemptsCache.get(getClientIP())
         return try {
             if (attempts >= MAX_ATTEMPT) {
-                logger.warn("$ip has been blocked too many login attempts.")
+                logger.warn(InternalErrors.IP_HAS_BEEN_BANNED.format(ip))
                 true
             } else {
                 false

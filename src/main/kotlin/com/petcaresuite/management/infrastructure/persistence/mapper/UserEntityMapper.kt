@@ -5,10 +5,11 @@ import com.petcaresuite.management.infrastructure.persistence.entity.UserEntity
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 
+
 @Mapper(componentModel = "spring")
-interface IUserMapper {
+interface UserEntityMapper {
     fun toEntity(userModel: User): UserEntity
 
-    @Mapping(target = "password", ignore = false) // TODO: Check this Optionally ignore sensitive fields
-    fun toModel(userEntity: UserEntity): User
+    @Mapping(target = "company.users", ignore = true) // Ignore users collection in company
+    fun toDomain(userEntity: UserEntity): User
 }

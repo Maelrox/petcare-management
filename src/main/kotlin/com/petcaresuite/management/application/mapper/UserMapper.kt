@@ -9,7 +9,7 @@ import org.mapstruct.Mapping
 import org.mapstruct.Mappings
 
 @Mapper(componentModel = "spring")
-interface IUserDTOMapper {
+interface UserMapper {
     @Mappings(
         Mapping(target = "id", ignore = true),
         Mapping(target = "username", source = "userRegisterDTO.userName"),
@@ -24,7 +24,7 @@ interface IUserDTOMapper {
         Mapping(target = "lastModified", expression = "java(LocalDateTime.now())"),
         Mapping(target = "company", ignore = true)
     )
-    fun toUser(userRegisterDTO: UserRegisterDTO, roles: Set<Role>): User
+    fun toDomain(userRegisterDTO: UserRegisterDTO, roles: Set<Role>): User
 
     @Mappings(
         Mapping(target = "id", ignore = true),
@@ -34,7 +34,8 @@ interface IUserDTOMapper {
         Mapping(target = "roles", ignore = true),
         Mapping(target = "country", source = "user.country"),
         Mapping(target = "phone", source = "user.phone"),
+        Mapping(target = "companyId", ignore = true)
     )
-    fun toUserDetailsDTO(user: User): UserDetailsDTO
+    fun toDTO(user: User): UserDetailsDTO
 
 }

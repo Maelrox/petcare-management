@@ -1,6 +1,6 @@
 package com.petcaresuite.management.interfaces.exception
 
-import com.petcaresuite.management.application.dto.ErrorResponse
+import com.petcaresuite.management.application.dto.ErrorResponseDTO
 import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,8 +23,8 @@ class RestExceptionHandler {
     private val logger: Logger = LoggerFactory.getLogger(RestExceptionHandler::class.java)
 
     @ExceptionHandler(ExpiredJwtException::class)
-    fun handleExpiredJwtException(ex: ExpiredJwtException): ResponseEntity<ErrorResponse> {
-        val errorResponse = ErrorResponse(
+    fun handleExpiredJwtException(ex: ExpiredJwtException): ResponseEntity<ErrorResponseDTO> {
+        val errorResponse = ErrorResponseDTO(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.UNAUTHORIZED.value(),
             error = HttpStatus.UNAUTHORIZED.reasonPhrase,
@@ -35,8 +35,8 @@ class RestExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException::class)
-    fun handleBadCredentialsException(ex: BadCredentialsException): ResponseEntity<ErrorResponse> {
-        val errorResponse = ErrorResponse(
+    fun handleBadCredentialsException(ex: BadCredentialsException): ResponseEntity<ErrorResponseDTO> {
+        val errorResponse = ErrorResponseDTO(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.UNAUTHORIZED.value(),
             error = HttpStatus.UNAUTHORIZED.reasonPhrase,
@@ -47,9 +47,9 @@ class RestExceptionHandler {
     }
 
     @ExceptionHandler(IllegalAccessException::class)
-    fun handleIllegalAccessException(ex: IllegalAccessException): ResponseEntity<ErrorResponse> {
+    fun handleIllegalAccessException(ex: IllegalAccessException): ResponseEntity<ErrorResponseDTO> {
         logger.warn("Illegal Access " + ex.message ?: "ex.stackTraceToString()")
-        val errorResponse = ErrorResponse(
+        val errorResponse = ErrorResponseDTO(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.FORBIDDEN.value(),
             error = HttpStatus.FORBIDDEN.reasonPhrase,
@@ -60,11 +60,11 @@ class RestExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationExceptions(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+    fun handleValidationExceptions(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponseDTO> {
         val errors = ex.bindingResult.fieldErrors.map { error ->
             "${error.field}: ${error.defaultMessage}"
         }
-        val errorResponse = ErrorResponse(
+        val errorResponse = ErrorResponseDTO(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.BAD_REQUEST.value(),
             error = HttpStatus.BAD_REQUEST.reasonPhrase,
@@ -75,8 +75,8 @@ class RestExceptionHandler {
     }
 
     @ExceptionHandler(value = [HttpMessageNotReadableException::class, IllegalArgumentException::class])
-    fun handleHttpMessageNotReadableException(ex: Exception): ResponseEntity<ErrorResponse> {
-        val errorResponse = ErrorResponse(
+    fun handleHttpMessageNotReadableException(ex: Exception): ResponseEntity<ErrorResponseDTO> {
+        val errorResponse = ErrorResponseDTO(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.BAD_REQUEST.value(),
             error = HttpStatus.BAD_REQUEST.reasonPhrase,
@@ -87,22 +87,22 @@ class RestExceptionHandler {
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleGlobalException(ex: Exception): ResponseEntity<ErrorResponse> {
+    fun handleGlobalException(ex: Exception): ResponseEntity<ErrorResponseDTO> {
         logger.error("Unhandled exception " + ex.message ?: "ex.stackTraceToString()")
-        val errorResponse = ErrorResponse(
+        val errorResponseDTO = ErrorResponseDTO(
             status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
             error = "Internal Server Error",
             message = ex.message ?: "Undefined error",
             path = getRequestPath()
         )
-        return ResponseEntity.status(errorResponse.status).body(errorResponse)
+        return ResponseEntity.status(errorResponseDTO.status).body(errorResponseDTO)
     }
 
     @ExceptionHandler(DataIntegrityViolationException::class)
-    fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException): ResponseEntity<ErrorResponse> {
+    fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException): ResponseEntity<ErrorResponseDTO> {
         logger.error("Unhandled exception " + ex.message ?: "ex.stackTraceToString()")
         val errorMessage = generateUserFriendlyErrorMessage(ex)
-        val errorResponse = ErrorResponse(
+        val errorResponseDTO = ErrorResponseDTO(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.BAD_REQUEST.value(),
             error = HttpStatus.BAD_REQUEST.reasonPhrase,
@@ -110,7 +110,7 @@ class RestExceptionHandler {
             path = getRequestPath()
         )
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO)
     }
 
     private fun generateUserFriendlyErrorMessage(ex: DataIntegrityViolationException): String {

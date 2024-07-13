@@ -1,4 +1,4 @@
-package com.petcaresuite.management.interfaces.web.authentication
+package com.petcaresuite.management.interfaces.web
 
 import com.petcaresuite.management.application.dto.AuthenticationRequestDTO
 import com.petcaresuite.management.application.dto.AuthenticationResponseDTO
