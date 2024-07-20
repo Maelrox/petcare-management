@@ -18,7 +18,7 @@ class AuthorizationAspect(private val authorizationService: AuthorizationService
         val targetClass = joinPoint.target.javaClass
         val method = signature.method
 
-        if (!authorizationService.isAuthorized(method, targetClass)) {
+        if (!authorizationService.isAuthorized(method.name, targetClass.simpleName)) {
             throw IllegalAccessException(Responses.OPERATION_NOT_ALLOWED)
         }
 

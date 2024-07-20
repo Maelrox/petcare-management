@@ -49,7 +49,7 @@ class CompanyService(
         companyValidationService.validateCompanyIdentification(companyDTO.companyIdentification)
     }
 
-    fun validateUpdate(companyDTO: CompanyDTO, user: User, company: Company, companyId: Long) {
+    private fun validateUpdate(companyDTO: CompanyDTO, user: User, company: Company, companyId: Long) {
         companyValidationService.validateUserCompanyAccess(user, companyId)
         if (company.name != companyDTO.name) {
             companyValidationService.validateName(companyDTO.name)
@@ -60,11 +60,10 @@ class CompanyService(
     }
 
     private fun setUpdatableFields(companyDTO: CompanyDTO, company: Company): Company {
-        return Company(
+        return company.copy(
             companyIdentification = companyDTO.companyIdentification,
-            id =  company.id,
             name = companyDTO.name,
-            users =  ArrayList(),
+            users =  emptyList(),
             country = companyDTO.country
         )
     }

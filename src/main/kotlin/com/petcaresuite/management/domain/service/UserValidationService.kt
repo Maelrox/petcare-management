@@ -1,7 +1,6 @@
 package com.petcaresuite.management.domain.service
 
 import com.petcaresuite.management.application.dto.*
-import com.petcaresuite.management.domain.model.RoleType
 import com.petcaresuite.management.application.port.output.RolePersistencePort
 import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
@@ -22,14 +21,14 @@ class UserValidationService(
         val currentUserId: CustomUserDetails =
             SecurityContextHolder.getContext().authentication.principal as CustomUserDetails
         // TODO: Context shouldn't depend of a single server
-        if (currentUserId.getUserId() != userUpdateDTO.id && !SecurityContextHolder.getContext().authentication.authorities.any { it.authority == RoleType.SYSADMIN.toString() }) {
+        if (currentUserId.getUserId() != userUpdateDTO.id && !SecurityContextHolder.getContext().authentication.authorities.any { it.authority == "SYSADMIN" }) {
             throw IllegalAccessException(Responses.USER_UPDATE_NOT_ALLOWED)
         }
     }
 
     fun validateRoles(roles: Set<String>?) {
         roles?.forEach { roleName ->
-            rolePersistencePort.findByName(RoleType.valueOf(roleName))
+            rolePersistencePort.findByName(roleName)
                 ?: throw IllegalArgumentException(Responses.ROLE_NOT_FOUND.format(roleName))
         }
     }

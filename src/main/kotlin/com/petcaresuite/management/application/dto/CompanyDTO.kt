@@ -1,15 +1,17 @@
 package com.petcaresuite.management.application.dto
 
+import com.petcaresuite.management.application.service.messages.Responses
 import jakarta.validation.constraints.*
 
 data class CompanyDTO(
-    @field:NotNull(message = "Company name is required")
-    @field:Size(min = 3, max = 255, message = "Company length must be between 3 and 255 characters")
+    val id: Long? = 0,
+    @field:NotNull(message = Responses.COMPANY_NAME_REQUIRED)
+    @field:Size(min = 3, max = 255, message = Responses.COMPANY_NAME_LENGTH_INVALID)
     val name: String,
-    @field:NotNull(message = "Country is required")
-    @field:Size(min = 3, max = 255, message = "Username length must be between 3 and 255 characters")
+    @field:NotNull(message = Responses.COMPANY_COUNTRY_REQUIRED)
+    @field:Size(min = 3, max = 255, message = Responses.COMPANY_COUNTRY_LENGTH_INVALID)
     val country: String?,
-    @field:NotNull(message = "Company Identification")
-    @field:Size(min = 3, max = 255, message = "Company identification length must be between 3 and 255 characters")
+    @field:NotNull(message = Responses.COMPANY_IDENTIFICATION_REQUIRED)
+    @field:Size(min = 3, max = 255, message = Responses.COMPANY_IDENTIFICATION_LENGTH_INVALID)
     val companyIdentification: String,
 )

@@ -82,7 +82,7 @@ class RestExceptionHandler {
             timestamp = LocalDateTime.now(),
             status = HttpStatus.BAD_REQUEST.value(),
             error = HttpStatus.BAD_REQUEST.reasonPhrase,
-            message = ex.message ?: Responses.MALFORMED_JSON,
+            message = Responses.MALFORMED_JSON,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponse.status).body(errorResponse)
@@ -94,7 +94,7 @@ class RestExceptionHandler {
         val errorResponseDTO = ErrorResponseDTO(
             status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
             error = HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
-            message = ex.message ?: InternalErrors.UNHANDLED_EXCEPTION,
+            message = InternalErrors.UNHANDLED_EXCEPTION,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponseDTO.status).body(errorResponseDTO)

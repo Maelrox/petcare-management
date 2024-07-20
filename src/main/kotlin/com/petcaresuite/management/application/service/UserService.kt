@@ -8,7 +8,6 @@ import com.petcaresuite.management.application.port.output.RolePersistencePort
 import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.model.Role
-import com.petcaresuite.management.domain.model.RoleType
 import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.domain.service.UserValidationService
 import com.petcaresuite.management.infrastructure.security.UserDetailsService
@@ -69,6 +68,9 @@ class UserService(
     }
 
     private fun validateUserRegistration(userRegisterDTO: UserRegisterDTO) {
+        if (userRegisterDTO.roles!!.contains("SYSADMIN")) {
+            throw IllegalArgumentException(Responses.REGISTER_AS_SYSADMIN_ERROR)
+        }
         userValidationService.validateRoles(userRegisterDTO.roles)
         userValidationService.validatePasswordComplexity(userRegisterDTO.password!!)
         userValidationService.validateUserDoesNotExist(userRegisterDTO.userName!!)
@@ -82,7 +84,7 @@ class UserService(
 
     private fun retrieveRoles(roles: Set<String>): Set<Role> {
         return roles.mapNotNull { roleName ->
-            rolePersistencePort.findByName(RoleType.valueOf(roleName))
+            rolePersistencePort.findByName(roleName)
         }.toSet()
     }
 
@@ -104,7 +106,7 @@ class UserService(
         if (authentication != null && authentication.isAuthenticated) {
             val principal: Any = authentication.principal
             return if (principal is UserDetails) {
-                (principal).username
+                principal.username
             } else {
                 principal.toString()
             }

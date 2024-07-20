@@ -46,7 +46,6 @@ class SecurityConfig(
         return http.build()
     }
 
-    @Bean
     fun authenticationProvider(): AuthenticationProvider {
         val authProvider = DaoAuthenticationProvider()
         authProvider.setUserDetailsService(customUserDetailsService)

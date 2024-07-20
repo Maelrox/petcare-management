@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.petcaresuite.microservice-management' is invalid and this project uses 'com.petcaresuite.microservice_management' instead.
+* The original package name 'com.petcaresuite.microservice-management' is invalid and this project uses 'com.petcaresuite.management' instead.
 
 # Getting Started
 
