@@ -6,7 +6,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = [RoleEntityMapper::class])
 interface UserEntityMapper {
     fun toEntity(userModel: User): UserEntity
 

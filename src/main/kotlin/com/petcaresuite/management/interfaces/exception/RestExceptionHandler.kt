@@ -82,7 +82,7 @@ class RestExceptionHandler {
             timestamp = LocalDateTime.now(),
             status = HttpStatus.BAD_REQUEST.value(),
             error = HttpStatus.BAD_REQUEST.reasonPhrase,
-            message = Responses.MALFORMED_JSON,
+            message = ex.message ?: Responses.MALFORMED_JSON,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponse.status).body(errorResponse)

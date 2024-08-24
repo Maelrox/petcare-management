@@ -36,7 +36,7 @@ data class UserEntity(
     @Column(name = "created_date", nullable = false)
     val createdDate: LocalDateTime = LocalDateTime.now(),
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")
     val company: CompanyEntity? = null,
 
@@ -47,5 +47,9 @@ data class UserEntity(
         inverseJoinColumns = [JoinColumn(name = "role_id")]
     )
     val roles: Set<RoleEntity> = setOf()
-
 )
+{
+    override fun toString(): String {
+        return "UserEntity(id=$id, username='$username', email='$email', name=$name, phone=$phone, country=$country, enabled=$enabled, lastModified=$lastModified, createdDate=$createdDate)"
+    }
+}

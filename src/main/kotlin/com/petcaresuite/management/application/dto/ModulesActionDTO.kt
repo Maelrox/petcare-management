@@ -1,9 +1,11 @@
 package com.petcaresuite.management.application.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.petcaresuite.management.application.service.messages.Responses
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class ModulesActionDTO(
     val id: Long?,
     @field:NotNull(message = Responses.MODULES_ACTION_NAME_REQUIRED)

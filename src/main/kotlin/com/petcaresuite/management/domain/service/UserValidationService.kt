@@ -4,7 +4,7 @@ import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.application.port.output.RolePersistencePort
 import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
-import com.petcaresuite.management.domain.valueobject.CustomUserDetails
+import com.petcaresuite.management.application.security.CustomUserDetails
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 

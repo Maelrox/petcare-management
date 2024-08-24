@@ -30,11 +30,11 @@ interface UserMapper {
         Mapping(target = "id", ignore = true),
         Mapping(target = "email", source = "user.email"),
         Mapping(target = "name", source = "user.name"),
-        Mapping(target = "enabled", constant = "true"),
-        Mapping(target = "roles", ignore = true),
+        Mapping(target = "enabled", source = "user.enabled"),
+        Mapping(target = "roles", source = "user.roles"),
         Mapping(target = "country", source = "user.country"),
         Mapping(target = "phone", source = "user.phone"),
-        Mapping(target = "companyId", ignore = true)
+        Mapping(target = "companyId", source = "user.company.id")
     )
     fun toDTO(user: User): UserDetailsDTO
 

@@ -14,6 +14,7 @@ interface RoleEntityMapper {
     )
     fun toEntity(roleModel: Role): RoleEntity
 
+    @Mapping(target = "company", ignore = true)
     fun toDomain(roleEntity: RoleEntity): Role
 
     fun toDomainSet(roleEntities: Set<RoleEntity>): Set<Role>

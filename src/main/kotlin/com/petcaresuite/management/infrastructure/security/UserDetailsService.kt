@@ -1,7 +1,7 @@
 package com.petcaresuite.management.infrastructure.security
 
 import com.petcaresuite.management.application.port.output.UserPersistencePort
-import com.petcaresuite.management.domain.valueobject.CustomUserDetails
+import com.petcaresuite.management.application.security.CustomUserDetails
 import com.petcaresuite.management.domain.model.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -19,12 +19,12 @@ class UserDetailsService(
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
         if (loginAttemptAdapter.isBlocked()) {
-            throw IllegalAccessException("Too many attempts wait 24 hours");
+            throw IllegalAccessException("Too many attempts wait 24 hours")
         }
         val user: Optional<User> = userRepository.getUserInfoByUsername(username)
-        return user.map { user: User? ->
+        return user.map { u: User? ->
             CustomUserDetails(
-                user!!
+                u!!
             )
         }.orElseThrow {
             UsernameNotFoundException(
