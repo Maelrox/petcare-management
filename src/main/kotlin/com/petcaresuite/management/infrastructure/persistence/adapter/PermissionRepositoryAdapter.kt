@@ -56,8 +56,8 @@ class PermissionRepositoryAdapter(
         jpaPermissionRepository.deleteRemovedPermissions(roleId, permissionIds)
     }
 
-    override fun deleteRemovedModules(roleId: Long, permissionIds: List<Long>) {
-        jpaPermissionRepository.deleteRemovedModules(roleId, permissionIds)
+    override fun deleteRemovedModules(roleId: Long, permissionIds: List<Long>, moduleId: Long) {
+        jpaPermissionRepository.deleteRemovedModules(roleId, permissionIds, moduleId)
     }
 
     override fun delete(id: Long) {

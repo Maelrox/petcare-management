@@ -20,7 +20,7 @@ interface PermissionPersistencePort {
 
     fun deleteRemovedRoles(permissionId: Long, rolesIds: List<Long>)
 
-    fun deleteRemovedModules(permissionId: Long, rolesIds: List<Long>)
+    fun deleteRemovedModules(permissionId: Long, rolesIds: List<Long>, moduleId: Long)
 
     fun delete(id: Long)
 

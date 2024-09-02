@@ -32,12 +32,29 @@ interface JpaPermissionRepository : JpaRepository<PermissionEntity, Long> {
     fun findAllByCompanyId(companyId: Long): Set<PermissionEntity>
 
     @Modifying
-    @Query(value = "DELETE FROM role_permissions WHERE permission_id = :permissionId AND role_id IN :rolesIds", nativeQuery = true)
+    @Query(
+        value = "DELETE FROM role_permissions WHERE permission_id = :permissionId AND role_id IN :rolesIds",
+        nativeQuery = true
+    )
     fun deleteRemovedPermissions(permissionId: Long, rolesIds: List<Long>)
 
     @Modifying
-    @Query(value = "DELETE FROM permission_modules_actions WHERE permission_id = :permissionId AND module_action_id NOT IN :moduleActionsId", nativeQuery = true)
-    fun deleteRemovedModules(permissionId: Long, moduleActionsId: List<Long>)
+    @Query(
+        value = """
+            DELETE FROM permission_modules_actions 
+            WHERE permission_id = :permissionId 
+            AND module_action_id IN (
+                SELECT pma.module_action_id 
+                FROM permission_modules_actions pma 
+                INNER JOIN modules_actions ma ON ma.id = pma.module_action_id 
+                WHERE ma.module_id = :moduleId
+            ) 
+            AND module_action_id NOT IN :moduleActionsId
+        """,
+        nativeQuery = true
+    )
+    fun deleteRemovedModules(permissionId: Long, moduleActionsId: List<Long>, moduleId: Long)
+
 
     @Modifying
     @Query(value = "DELETE FROM permission_modules_actions WHERE permission_id = :permissionId", nativeQuery = true)

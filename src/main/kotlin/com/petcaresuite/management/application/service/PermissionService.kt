@@ -64,7 +64,7 @@ class PermissionService(
             permissionDomainService.updatePermissionModules(currentActions, actionsToUpdate, validActions, user)
         permission.modulesAction!!.addAll(updatedActions)
         permissionPersistencePort.save(permission)
-        permissionPersistencePort.deleteRemovedModules(permission.id!!, modulesActionIds)
+        permissionPersistencePort.deleteRemovedModules(permission.id!!, modulesActionIds, permissionModulesDTO.moduleId)
         return ResponseDTO(Responses.PERMISSION_UPDATED.format(permission.name))
     }
 

@@ -17,7 +17,7 @@ interface JpaModuleActionRepository : JpaRepository<ModulesActionEntity, Long> {
     @Query("""
         select ma.* from permission_modules_actions pma
         inner join modules_actions ma on ma.id = pma.module_action_id 
-        where pma.permission_id = 27 and ma.module_id = 3""", nativeQuery = true)
+        where pma.permission_id = :permissionId and ma.module_id = :moduleId""", nativeQuery = true)
     fun findAllByPermissionIdAndModuleId(permissionId: Long, moduleId: Long): List<ModulesActionEntity>
 
 }

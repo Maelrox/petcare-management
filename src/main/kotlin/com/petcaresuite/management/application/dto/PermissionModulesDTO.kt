@@ -12,5 +12,6 @@ data class PermissionModulesDTO(
     @field:NotNull(message = Responses.PERMISSION_NAME_REQUIRED)
     @field:Size(min = 3, max = 32, message = Responses.PERMISSION_LENGTH_INVALID)
     val name: String,
-    val modulesAction: Set<ModulesActionDTO>
+    val modulesAction: Set<ModulesActionDTO>,
+    val moduleId: Long
 )
