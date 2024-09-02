@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository
 interface JpaModuleRepository : JpaRepository<ModuleEntity, Long> {
 
     fun findByName(name: String): ModuleEntity?
+
     fun existsByName(name: String): Boolean
+
+    fun findAllByIdIn(modulesActionIds: List<Long>): List<ModuleEntity>
 
 }

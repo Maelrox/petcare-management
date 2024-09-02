@@ -6,7 +6,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Mappings
 
-@Mapper(componentModel = "spring", uses = [CompanyEntityMapper::class])
+@Mapper(componentModel = "spring", uses = [CompanyEntityMapper::class, ModuleEntityMapper::class])
 interface RoleEntityMapper {
 
     @Mappings(
@@ -14,9 +14,10 @@ interface RoleEntityMapper {
     )
     fun toEntity(roleModel: Role): RoleEntity
 
-    @Mapping(target = "company", ignore = true)
     fun toDomain(roleEntity: RoleEntity): Role
 
-    fun toDomainSet(roleEntities: Set<RoleEntity>): Set<Role>
+    fun toDomainSet(roleEntities: List<RoleEntity>): List<Role>
+
+    fun toEntity(roleModel: List<Role>): List<RoleEntity>
 
 }

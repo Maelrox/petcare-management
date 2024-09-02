@@ -36,4 +36,12 @@ class ModuleRepositoryAdapter(
         return jpaModuleRepository.existsById(id)
     }
 
+    override fun getAll(): List<Module> {
+        return moduleMapper.toDomain(jpaModuleRepository.findAll())
+    }
+
+    override fun findAllById(modulesActionIds: List<Long>): List<Module> {
+        return moduleMapper.toDomain(jpaModuleRepository.findAllByIdIn(modulesActionIds))
+    }
+
 }

@@ -42,7 +42,11 @@ object Responses {
     const val ROLE_COMPANY_REQUIRED = "Role company required"
     const val ROLE_ALREADY_EXIST = "Rol already exists"
     const val ROLE_CREATED = "Role created"
+    const val ROLE_UPDATED = "Role updated"
+    const val ROLE_DELETED = "Role deleted"
+    const val ROLE_NOT_PART_OF_THE_COMPANY = "Role is not part of the company"
 
+    const val PERMISSION_ID_REQUIRED = "Permission id is required"
     const val PERMISSION_NAME_REQUIRED = "Permission name is required"
     const val PERMISSION_LENGTH_INVALID = "Permission length is invalid"
     const val PERMISSION_ROLE_REQUIRED = "Permission role required"
@@ -59,9 +63,13 @@ object Responses {
     const val MODULES_ACTION_CREATED = "The modules action %s has been created"
 
     const val PERMISSION_CREATED = "Permission %s created"
+    const val PERMISSION_UPDATED = "Permission %s updated"
+    const val PERMISSION_DELETED = "Permission deleted"
+    const val PERMISSION_ADDED = "Permission %s configured for the selected role(s)"
     const val PERMISSION_ALREADY_EXISTS = "Permission already exists"
     const val PERMISSION_NOT_FOUND = "Permission not found"
     const val PERMISSION_NOT_PART_OF_THE_COMPANY = "Permission is not part of the company"
+    const val PERMISSION_ALREADY_EXISTS_FOR_THE_ROLE = "Permission already exist for the role"
     const val PERMISSION_MODULES_ACTION_CREATED = "Permission modules action created"
 
 }

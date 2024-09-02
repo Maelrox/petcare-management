@@ -1,5 +1,6 @@
 package com.petcaresuite.management.interfaces.web
 
+import com.petcaresuite.management.application.dto.ModulesActionDTO
 import com.petcaresuite.management.application.dto.PermissionModuleActionDTO
 import com.petcaresuite.management.application.dto.ResponseDTO
 import com.petcaresuite.management.application.port.input.PermissionModulesActionUseCase
@@ -16,6 +17,12 @@ class PermissionModulesActionController(private val permissionModulesActionUseCa
     @Authorize
     fun savePermissionModulesAction(@Valid @RequestBody dto: PermissionModuleActionDTO): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(permissionModulesActionUseCase.save(dto))
+    }
+
+    @GetMapping("/{permissionId}/{moduleId}")
+    @Authorize
+    fun getModuleActions(@PathVariable permissionId: Long, @PathVariable moduleId: Long): ResponseEntity<List<ModulesActionDTO>> {
+        return ResponseEntity.ok(permissionModulesActionUseCase.getAllByPermissionIdAndModuleId(permissionId, moduleId))
     }
 
 }

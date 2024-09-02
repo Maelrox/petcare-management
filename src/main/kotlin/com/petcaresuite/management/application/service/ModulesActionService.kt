@@ -17,8 +17,8 @@ class ModulesActionService(
 ) : ModulesActionUseCase {
 
     override fun save(modulesActionDTO: ModulesActionDTO): ResponseDTO {
-        validationService.validateModuleId(modulesActionDTO.module.id!!)
-        validationService.validateNameDuplicated(modulesActionDTO.name, modulesActionDTO.module.id)
+        validationService.validateModuleId(modulesActionDTO.module!!.id!!)
+        validationService.validateNameDuplicated(modulesActionDTO.name, modulesActionDTO.module!!.id!!)
         val module = modulesActionMapper.toDomain(modulesActionDTO)
         modulesActionPersistencePort.save(module)
         return ResponseDTO(Responses.MODULES_ACTION_CREATED.format(modulesActionDTO.name))

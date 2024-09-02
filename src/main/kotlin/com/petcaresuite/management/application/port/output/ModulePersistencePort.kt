@@ -12,4 +12,8 @@ interface ModulePersistencePort {
 
     fun existsById(id: Long): Boolean
 
+    fun getAll(): List<Module>
+
+    fun findAllById(modulesActionIds: List<Long>): List<Module>
+
 }

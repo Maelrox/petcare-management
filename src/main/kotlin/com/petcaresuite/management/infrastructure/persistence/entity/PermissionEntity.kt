@@ -10,12 +10,16 @@ data class PermissionEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    val id: Int? = null,
+    val id: Long? = null,
 
     @Size(max = 64)
     @NotNull
     @Column(name = "name", nullable = false, length = 64)
     val name: String,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    val company: CompanyEntity,
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

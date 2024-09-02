@@ -6,12 +6,13 @@ import com.petcaresuite.management.application.mapper.ModuleMapper
 import com.petcaresuite.management.application.port.input.ModuleUseCase
 import com.petcaresuite.management.application.port.output.ModulePersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
-import com.petcaresuite.management.domain.service.ModuleValidationService
+import com.petcaresuite.management.domain.service.ModuleDomainService
 import org.springframework.stereotype.Service
 
 @Service
 class ModuleService(
-    private val validationService: ModuleValidationService,
+    private val validationService: ModuleDomainService,
+    private val userService: UserService,
     private val modulePersistencePort: ModulePersistencePort,
     private val moduleMapper: ModuleMapper
 ) : ModuleUseCase {
@@ -21,6 +22,11 @@ class ModuleService(
         val module = moduleMapper.toDomain(moduleDTO)
         modulePersistencePort.save(module)
         return ResponseDTO(Responses.MODULE_CREATED.format(moduleDTO.name))
+    }
+
+    override fun getAll(): List<ModuleDTO> {
+        val modules = modulePersistencePort.getAll()
+        return moduleMapper.toDTO(modules)
     }
 
 }

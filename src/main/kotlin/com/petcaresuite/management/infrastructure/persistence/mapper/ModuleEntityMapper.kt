@@ -4,9 +4,12 @@ import com.petcaresuite.management.infrastructure.persistence.entity.ModuleEntit
 import org.mapstruct.Mapper
 import com.petcaresuite.management.domain.model.Module
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = [ModulesActionEntityMapper::class])
 interface ModuleEntityMapper {
     fun toEntity(module: Module): ModuleEntity
 
     fun toDomain(moduleEntity: ModuleEntity): Module
+
+    fun toDomain(moduleEntity: List<ModuleEntity>): List<Module>
+
 }

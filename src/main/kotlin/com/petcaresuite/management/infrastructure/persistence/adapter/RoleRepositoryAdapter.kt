@@ -5,6 +5,8 @@ import com.petcaresuite.management.application.port.output.RolePersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.infrastructure.persistence.mapper.RoleEntityMapper
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaRoleRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 
 @Component
@@ -24,6 +26,12 @@ class RoleRepositoryAdapter(
         return roleMapper.toDomain(roleEntity)
     }
 
+    override fun saveAll(roles: List<Role>): List<Role>? {
+        val roleEntities = roleMapper.toEntity(roles)
+        jpaRoleRepository.saveAll(roleEntities)
+        return roleMapper.toDomainSet(roleEntities)
+    }
+
     override fun update(role: Role): Role? {
         val roleEntity = roleMapper.toEntity(role)
         jpaRoleRepository.save(roleEntity)
@@ -41,9 +49,18 @@ class RoleRepositoryAdapter(
         return roleMapper.toDomain(roleEntity)
     }
 
-    override fun findAllByCompanyId(id: Long): Set<Role> {
+    override fun findAllByCompanyId(id: Long): List<Role> {
         val rolesEntity = jpaRoleRepository.findAllByCompanyId(id)
         return roleMapper.toDomainSet(rolesEntity)
+    }
+
+    override fun findAllByFilterPaginated(filter: Role, pageable: Pageable, companyId: Long): Page<Role> {
+        val pagedRolesEntity = jpaRoleRepository.findAllByFilter(filter, pageable, companyId)
+        return pagedRolesEntity.map { roleMapper.toDomain(it) }
+    }
+
+    override fun delete(id: Long) {
+        jpaRoleRepository.deleteById(id)
     }
 
 }

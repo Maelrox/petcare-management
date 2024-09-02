@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 private const val PASSWORD_REGEX = """^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&\s]{8,}$"""
 
 @Service
-class UserValidationService(
+class UserDomainService(
     private val userPersistencePort: UserPersistencePort,
     private val rolePersistencePort: RolePersistencePort,
 ) {

@@ -90,11 +90,12 @@ class RestExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleGlobalException(ex: Exception): ResponseEntity<ErrorResponseDTO> {
-        logger.error(InternalErrors.UNHANDLED_EXCEPTION.format(ex.message))
+        var message = InternalErrors.UNHANDLED_EXCEPTION.format(ex.message)
+        logger.error(message)
         val errorResponseDTO = ErrorResponseDTO(
             status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
             error = HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
-            message = InternalErrors.UNHANDLED_EXCEPTION,
+            message = message,
             path = getRequestPath()
         )
         return ResponseEntity.status(errorResponseDTO.status).body(errorResponseDTO)

@@ -16,7 +16,7 @@ class LoginAttemptService (
     private val request: HttpServletRequest
 ) : LoginAttemptUseCase {
     companion object {
-        const val MAX_ATTEMPT = 10
+        const val MAX_ATTEMPT = 5
         private val logger = LoggerFactory.getLogger(LoginAttemptService::class.java)
     }
 
@@ -41,7 +41,7 @@ class LoginAttemptService (
         val ip = attemptsCache.get(getClientIP())
         return try {
             if (attempts >= MAX_ATTEMPT) {
-                logger.warn(InternalErrors.IP_HAS_BEEN_BANNED.format(ip))
+                logger.warn(InternalErrors.IP_HAS_BEEN_BANNED.format(getClientIP(), "1 Day"))
                 true
             } else {
                 false

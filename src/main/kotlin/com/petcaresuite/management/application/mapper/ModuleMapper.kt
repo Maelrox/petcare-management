@@ -10,5 +10,6 @@ interface ModuleMapper {
     fun toDomain(moduleDTO: ModuleDTO): Module
 
     fun toDTO(module: Module): ModuleDTO
+    fun toDTO(module: List<Module>): List<ModuleDTO>
 
 }

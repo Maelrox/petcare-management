@@ -6,10 +6,12 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class ModulesActionDTO(
+data class PermissionRolesDTO(
     val id: Long?,
-    @field:NotNull(message = Responses.MODULES_ACTION_NAME_REQUIRED)
-    @field:Size(min = 3, max = 32, message = Responses.MODULES_ACTION_LENGTH_INVALID)
-    val name: String,
-    val module: ModuleDTO?,
+    @field:NotNull(message = Responses.PERMISSION_NAME_REQUIRED)
+    @field:Size(min = 3, max = 32, message = Responses.PERMISSION_LENGTH_INVALID)
+    val name: String?,
+    var modulesAction: MutableSet<ModulesActionDTO>?,
+    val roles: Set<RoleDTO>?,
+    var company: CompanyDTO?,
 )

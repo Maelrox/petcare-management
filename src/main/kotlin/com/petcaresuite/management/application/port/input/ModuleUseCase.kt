@@ -7,4 +7,6 @@ interface ModuleUseCase {
 
     fun save(moduleDTO: ModuleDTO): ResponseDTO
 
+    fun getAll(): List<ModuleDTO>
+
 }

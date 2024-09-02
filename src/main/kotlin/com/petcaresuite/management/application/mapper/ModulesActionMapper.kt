@@ -11,4 +11,6 @@ interface ModulesActionMapper {
 
     fun toDTO(module: ModulesAction): ModulesActionDTO
 
+    fun toDTO(modulesAction: List<ModulesAction>): List<ModulesActionDTO>
+
 }

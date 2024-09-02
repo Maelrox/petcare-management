@@ -11,8 +11,7 @@ data class RoleDTO(
     @field:NotNull(message = Responses.ROLE_NAME_REQUIRED)
     @field:Size(min = 3, max = 32, message = Responses.ROLE_LENGTH_INVALID)
     val name: String?,
-    @field:NotNull(message = Responses.ROLE_COMPANY_REQUIRED)
-    val company: CompanyDTO?,
+    var company: CompanyDTO?,
     val permissions: MutableSet<PermissionDTO>?
 
 )

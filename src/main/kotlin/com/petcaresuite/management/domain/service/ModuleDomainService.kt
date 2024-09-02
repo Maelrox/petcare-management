@@ -5,7 +5,7 @@ import com.petcaresuite.management.application.service.messages.Responses
 import org.springframework.stereotype.Service
 
 @Service
-class ModuleValidationService(private val modulePersistencePort: ModulePersistencePort) {
+class ModuleDomainService(private val modulePersistencePort: ModulePersistencePort) {
 
     fun validateNameDuplicated(name: String) {
         modulePersistencePort.existsByName(name).takeIf { it }?.let {

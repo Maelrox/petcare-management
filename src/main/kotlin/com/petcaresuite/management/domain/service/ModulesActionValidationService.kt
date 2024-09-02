@@ -30,7 +30,7 @@ class ModulesActionValidationService(
         }
     }
 
-    fun validateCompanyRoles(roles: Set<Role>) {
+    fun validateCompanyRoles(roles: List<Role>) {
         if (roles.isEmpty()) {
             throw IllegalArgumentException(Responses.COMPANY_WITHOUT_ROLES)
         }

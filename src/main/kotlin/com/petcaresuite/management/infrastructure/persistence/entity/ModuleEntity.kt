@@ -25,6 +25,6 @@ data class ModuleEntity (
     @Column(name = "updated_date")
     val updatedDate: Instant? = null,
 
-    @OneToMany(mappedBy = "module")
-    val modulesActionEntities: MutableSet<ModulesActionEntity>? = mutableSetOf()
+    @OneToMany(mappedBy = "module", fetch = FetchType.EAGER)
+    val modulesActionEntities: List<ModulesActionEntity>?
 )

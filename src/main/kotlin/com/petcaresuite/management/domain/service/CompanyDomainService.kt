@@ -6,7 +6,7 @@ import com.petcaresuite.management.domain.model.User
 import org.springframework.stereotype.Service
 
 @Service
-class CompanyValidationService(
+class CompanyDomainService(
     private val companyPersistencePort: CompanyPersistencePort,
 ) {
 

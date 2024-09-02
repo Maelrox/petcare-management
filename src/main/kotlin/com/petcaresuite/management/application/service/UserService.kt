@@ -9,7 +9,7 @@ import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.model.Role
 import com.petcaresuite.management.domain.model.User
-import com.petcaresuite.management.domain.service.UserValidationService
+import com.petcaresuite.management.domain.service.UserDomainService
 import com.petcaresuite.management.infrastructure.security.UserDetailsService
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 
 @Service
 class UserService(
-    private val userValidationService: UserValidationService,
+    private val userDomainService: UserDomainService,
     private val rolePersistencePort: RolePersistencePort,
     private val userPersistencePort: UserPersistencePort,
     private val passwordEncoder: PasswordEncoder,
@@ -71,15 +71,15 @@ class UserService(
         if (userRegisterDTO.roles!!.contains("SYSADMIN")) {
             throw IllegalArgumentException(Responses.REGISTER_AS_SYSADMIN_ERROR)
         }
-        userValidationService.validateRoles(userRegisterDTO.roles)
-        userValidationService.validatePasswordComplexity(userRegisterDTO.password!!)
-        userValidationService.validateUserDoesNotExist(userRegisterDTO.userName!!)
+        userDomainService.validateRoles(userRegisterDTO.roles)
+        userDomainService.validatePasswordComplexity(userRegisterDTO.password!!)
+        userDomainService.validateUserDoesNotExist(userRegisterDTO.userName!!)
     }
 
     private fun validateUserUpdate(userUpdateDTO: UserUpdateDTO) {
-        userValidationService.validateUpdatePermission(userUpdateDTO)
-        userValidationService.validateRoles(userUpdateDTO.roles)
-        userValidationService.validatePasswordComplexity(userUpdateDTO.password!!)
+        userDomainService.validateUpdatePermission(userUpdateDTO)
+        userDomainService.validateRoles(userUpdateDTO.roles)
+        userDomainService.validatePasswordComplexity(userUpdateDTO.password!!)
     }
 
     private fun retrieveRoles(roles: Set<String>): Set<Role> {

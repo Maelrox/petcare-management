@@ -18,5 +18,5 @@ data class CompanyEntity(
     val companyIdentification: String,
 
     @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val users: List<UserEntity> = emptyList()
+    val users: List<UserEntity>? = emptyList()
 )

@@ -8,13 +8,13 @@ import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.model.Company
 import com.petcaresuite.management.domain.model.User
-import com.petcaresuite.management.domain.service.CompanyValidationService
+import com.petcaresuite.management.domain.service.CompanyDomainService
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
 class CompanyService(
-    private val companyValidationService: CompanyValidationService,
+    private val companyDomainService: CompanyDomainService,
     private val companyPersistencePort: CompanyPersistencePort,
     private val userPersistencePort: UserPersistencePort,
     private val companyMapper: CompanyMapper,
@@ -44,18 +44,18 @@ class CompanyService(
     }
 
     private fun validateCreation(companyDTO: CompanyDTO, user: User) {
-        companyValidationService.validateUserCompanyExistence(user)
-        companyValidationService.validateName(companyDTO.name)
-        companyValidationService.validateCompanyIdentification(companyDTO.companyIdentification)
+        companyDomainService.validateUserCompanyExistence(user)
+        companyDomainService.validateName(companyDTO.name)
+        companyDomainService.validateCompanyIdentification(companyDTO.companyIdentification)
     }
 
     private fun validateUpdate(companyDTO: CompanyDTO, user: User, company: Company, companyId: Long) {
-        companyValidationService.validateUserCompanyAccess(user, companyId)
+        companyDomainService.validateUserCompanyAccess(user, companyId)
         if (company.name != companyDTO.name) {
-            companyValidationService.validateName(companyDTO.name)
+            companyDomainService.validateName(companyDTO.name)
         }
         if (company.companyIdentification != companyDTO.companyIdentification) {
-            companyValidationService.validateCompanyIdentification(companyDTO.companyIdentification)
+            companyDomainService.validateCompanyIdentification(companyDTO.companyIdentification)
         }
     }
 

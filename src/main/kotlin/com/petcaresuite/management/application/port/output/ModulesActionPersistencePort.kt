@@ -12,4 +12,9 @@ interface ModulesActionPersistencePort {
 
     fun existsById(id: Long): Boolean
 
+    fun getAllByIdIn(modulesActionIds: List<Long>): List<ModulesAction>
+
+    fun getByPermissionIdAndModuleId(permissionId: Long, moduleId: Long): List<ModulesAction>
+
+
 }

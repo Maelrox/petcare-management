@@ -36,4 +36,14 @@ class ModulesActionRepositoryAdapter(
         return jpaModuleActionRepository.existsById(id)
     }
 
+    override fun getAllByIdIn(modulesActionIds: List<Long>): List<ModulesAction> {
+        val moduleActionEntities = jpaModuleActionRepository.findAllByIdIn(modulesActionIds)
+        return modulesActionMapper.toDomain(moduleActionEntities)
+    }
+
+    override fun getByPermissionIdAndModuleId(permissionId: Long, moduleId: Long): List<ModulesAction> {
+        val modulesAction = jpaModuleActionRepository.findAllByPermissionIdAndModuleId(permissionId, moduleId)
+        return modulesActionMapper.toDomain(modulesAction)
+    }
+
 }

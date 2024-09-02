@@ -6,4 +6,6 @@ interface PermissionModulesActionUseCase {
     
     fun save(permissionModuleActionDTO: PermissionModuleActionDTO): ResponseDTO
 
+    fun getAllByPermissionIdAndModuleId(permissionId: Long, moduleId: Long): List<ModulesActionDTO>
+
 }
