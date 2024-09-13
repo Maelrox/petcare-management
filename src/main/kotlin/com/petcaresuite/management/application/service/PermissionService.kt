@@ -10,6 +10,7 @@ import com.petcaresuite.management.application.port.output.ModulesActionPersiste
 import com.petcaresuite.management.application.port.output.PermissionPersistencePort
 import com.petcaresuite.management.application.port.output.RolePersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
+import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.domain.service.PermissionDomainService
 
 import org.springframework.data.domain.Page
@@ -69,11 +70,8 @@ class PermissionService(
     }
 
     override fun save(permissionDTO: PermissionDTO): ResponseDTO {
-        val user = userService.getCurrentUser()
-        val permissions = permissionPersistencePort.findAllByCompanyId(user.company!!.id)
+        val permissions = permissionPersistencePort.findAllByCompanyId(permissionDTO.company!!.id!!)
         permissionDomainService.validateCreation(permissionDTO, permissions)
-        val companyDTO = companyMapper.toDTO(user.company!!)
-        permissionDTO.company = companyDTO
         var permission = permissionMapper.toDomain(permissionDTO)
         permissionPersistencePort.save(permission)!!
         return ResponseDTO(Responses.PERMISSION_CREATED.format(permissionDTO.name))
@@ -108,15 +106,26 @@ class PermissionService(
         return ResponseDTO(Responses.PERMISSION_DELETED)
     }
 
-    override fun hasPermission(module: String, action: String): Boolean {
-        val user = userService.getCurrentUser()
+    override fun hasPermission(user: User, module: String, action: String): Boolean {
         if (user.roles.isEmpty()) return false
-
         val moduleEntity = modulePersistencePort.findByName(module) ?: return false
         val actionId = moduleEntity.modulesActionEntities!!.find { it.name == action }?.id ?: return false
 
         return user.roles.any { role ->
             role.permissions?.flatMap { it.modulesAction ?: emptyList() }?.any { it.id == actionId } == true
         }
+    }
+
+    override fun validatePermission(user: User, module: String, action: String): ResponseDTO? {
+        return if (hasPermission(user, module, action)) {
+            ResponseDTO(user.company!!.id.toString())
+        } else {
+            ResponseDTO(false, "You don't have permissions for the operation")
+        }
+
+    }
+
+    override fun getCurrentUser(): User {
+        return userService.getCurrentUser()
     }
 }

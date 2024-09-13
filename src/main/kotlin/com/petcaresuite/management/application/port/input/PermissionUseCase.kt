@@ -1,6 +1,7 @@
 package com.petcaresuite.management.application.port.input
 
 import com.petcaresuite.management.application.dto.*
+import com.petcaresuite.management.domain.model.User
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
@@ -18,6 +19,10 @@ interface PermissionUseCase {
 
     fun delete(id: Long): ResponseDTO?
 
-    fun hasPermission(module: String, action: String): Boolean
+    fun getCurrentUser(): User
+
+    fun hasPermission(user: User, module: String, action: String): Boolean
+
+    fun validatePermission(user: User, module: String, action: String): ResponseDTO?
 
 }

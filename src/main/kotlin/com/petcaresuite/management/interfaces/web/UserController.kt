@@ -2,6 +2,8 @@ package com.petcaresuite.management.interfaces.web
 
 import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.application.port.input.UserUseCase
+import com.petcaresuite.management.application.service.messages.Responses
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated

@@ -12,4 +12,5 @@ interface UserUseCase {
     fun getByToken(token: String): UserDetailsDTO
 
     fun getByUserName(username: String): User
+
 }

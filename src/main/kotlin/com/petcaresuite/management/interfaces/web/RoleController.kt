@@ -5,7 +5,9 @@ import com.petcaresuite.management.application.port.input.RoleUseCase
 import com.petcaresuite.management.application.security.Authorize
 import com.petcaresuite.management.application.service.modules.ModuleActions
 import com.petcaresuite.management.application.service.modules.Modules
+import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.infrastructure.security.PermissionRequired
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
@@ -18,7 +20,8 @@ class RoleController(private val roleUseCase: RoleUseCase) {
     @PostMapping()
     @Authorize
     @PermissionRequired(Modules.ROLES, ModuleActions.CREATE)
-    fun saveRole(@Valid @RequestBody dto: RoleDTO): ResponseEntity<ResponseDTO> {
+    fun saveRole(@Valid @RequestBody dto: RoleDTO, request: HttpServletRequest): ResponseEntity<ResponseDTO> {
+        val user = request.getAttribute("user") as UserDetailsDTO
         return ResponseEntity.ok(roleUseCase.save(dto))
     }
 
