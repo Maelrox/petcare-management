@@ -32,7 +32,7 @@ class AuthenticationUseCase(
         )
         val customPrincipal = authenticationResponse.principal as CustomUserDetails
         val user = customPrincipal.user
-        val (jwtToken, expirationDate) = jwtService.generateToken(user.username)
+        val (jwtToken, expirationDate) = jwtService.generateToken(user.username!!)
         val userDetailsDTO = userMapper.toDTO(user)
         return AuthenticationResponseDTO(
             message = Responses.USER_AUTHENTICATED,

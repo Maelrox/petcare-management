@@ -4,6 +4,7 @@ import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.application.mapper.CompanyMapper
 import com.petcaresuite.management.application.mapper.ModulesActionMapper
 import com.petcaresuite.management.application.mapper.PermissionMapper
+import com.petcaresuite.management.application.mapper.UserMapper
 import com.petcaresuite.management.application.port.input.PermissionUseCase
 import com.petcaresuite.management.application.port.output.ModulePersistencePort
 import com.petcaresuite.management.application.port.output.ModulesActionPersistencePort
@@ -28,6 +29,7 @@ class PermissionService(
     private val permissionMapper: PermissionMapper,
     private val modulesActionMapper: ModulesActionMapper,
     private val companyMapper: CompanyMapper,
+    private val userMapper: UserMapper,
     private val userService: UserService,
     private val moduleService: ModuleService,
 ) : PermissionUseCase {
@@ -116,9 +118,10 @@ class PermissionService(
         }
     }
 
-    override fun validatePermission(user: User, module: String, action: String): ResponseDTO? {
+    override fun validatePermission(userDetailsDTO: UserDetailsDTO, module: String, action: String): ResponseDTO? {
+        val user = userMapper.toDomain(userDetailsDTO)
         return if (hasPermission(user, module, action)) {
-            ResponseDTO(user.company!!.id.toString())
+            ResponseDTO(userDetailsDTO.companyId.toString())
         } else {
             ResponseDTO(false, "You don't have permissions for the operation")
         }

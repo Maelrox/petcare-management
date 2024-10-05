@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails
 class CustomUserDetails(val user: User) : UserDetails {
 
     private val id: Long = user.id
-    private val username: String = user.username
+    private val username: String = user.username!!
     private val password: String = user.password ?: throw IllegalArgumentException("Password cannot be null")
     private val authorities: Collection<GrantedAuthority> = user.roles
         .map { role -> SimpleGrantedAuthority(role.name) }

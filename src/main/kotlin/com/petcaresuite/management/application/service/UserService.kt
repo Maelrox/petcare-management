@@ -36,7 +36,7 @@ class UserService(
         val user = userMapper.toDomain(userRegisterDTO, roles)
         userPersistencePort.save(user)
         val userDetailsDTO = userMapper.toDTO(user)
-        val (jwtToken, expirationDate) = jwtPort.generateToken(user.username)
+        val (jwtToken, expirationDate) = jwtPort.generateToken(user.username!!)
         return AuthenticationResponseDTO(
             message = Responses.USER_CREATED,
             token = jwtToken,

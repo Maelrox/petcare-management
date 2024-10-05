@@ -38,4 +38,6 @@ interface UserMapper {
     )
     fun toDTO(user: User): UserDetailsDTO
 
+    fun toDomain(userRegisterDTO: UserDetailsDTO): User
+
 }

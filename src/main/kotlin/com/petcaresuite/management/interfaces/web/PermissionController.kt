@@ -86,7 +86,7 @@ class PermissionController(private val permissionUseCase: PermissionUseCase) {
     @SetCompany
     @GetMapping("/hasPermission")
     fun hasPermission(@RequestParam module: String, @RequestParam action: String, request: HttpServletRequest): ResponseEntity<ResponseDTO> {
-        val user = request.getAttribute("user") as User
+        val user = request.getAttribute("user") as UserDetailsDTO
         val responseDTO = permissionUseCase.validatePermission(user, module, action)
         return ResponseEntity.ok(responseDTO)
 

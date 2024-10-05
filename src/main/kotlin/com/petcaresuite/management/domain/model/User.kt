@@ -4,7 +4,7 @@
 
     data class User(
         val id: Long = 0,
-        val username: String,
+        val username: String?,
         var password: String?,
         var email: String,
         var name: String?,
@@ -12,7 +12,7 @@
         var country: String?,
         var enabled: Boolean,
         var lastModified: LocalDateTime?,
-        val createdDate: LocalDateTime,
+        val createdDate: LocalDateTime?,
         var company: Company?,
         var roles: Set<Role>
     )
