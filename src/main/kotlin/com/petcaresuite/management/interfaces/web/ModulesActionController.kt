@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController
 class ModulesActionController(private val modulesActionUseCase: ModulesActionUseCase) {
 
     @PostMapping()
-    @Authorize
     fun saveModuleAction(@Valid @RequestBody dto: ModulesActionDTO): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(modulesActionUseCase.save(dto))
     }

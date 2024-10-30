@@ -1,5 +1,6 @@
 package com.petcaresuite.management.domain.service
 
+import com.petcaresuite.management.application.dto.CompanyDTO
 import com.petcaresuite.management.application.port.output.CompanyPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.model.User
@@ -9,6 +10,12 @@ import org.springframework.stereotype.Service
 class CompanyDomainService(
     private val companyPersistencePort: CompanyPersistencePort,
 ) {
+
+    fun validateCreation(companyDTO: CompanyDTO, user: User) {
+        validateUserCompanyExistence(user)
+        validateName(companyDTO.name)
+        validateCompanyIdentification(companyDTO.companyIdentification)
+    }
 
     fun validateName(companyName: String) {
         companyPersistencePort.findCompanyByName(companyName)?.let {

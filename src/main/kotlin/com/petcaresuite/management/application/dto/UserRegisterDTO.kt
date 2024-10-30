@@ -22,12 +22,13 @@ data class UserRegisterDTO(
     @field:NotEmpty(message = "Name required")
     val name: String?,
 
-    @field:Pattern(regexp="\\(\\d{3}\\)\\d{3}-\\d{4}", message="Phone must match (###)###-####")
+    @field:Pattern(regexp="\\d{3}-\\d{3}-\\d{4}", message="Phone must match ###-###-####")
     val phone: String?,
 
-    @field:Size(min = 3, max = 255, message = "Country length must be between 3 and 255 characters")
+    @field:Size(min = 2, max = 8, message = "Country length must be between 2 and 8 characters")
     val country: String?,
 
     val enabled: Boolean?,
-    val companyId: Long?
+    val companyId: Long?,
+    val company: CompanyDTO,
 )

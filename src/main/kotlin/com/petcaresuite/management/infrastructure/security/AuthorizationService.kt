@@ -14,9 +14,6 @@ class AuthorizationService(
         val authentication = SecurityContextHolder.getContext().authentication
         val username = authentication.name
         val user = userService.getByUserName(username)
-        return user.roles.any { it.name == "SYSADMIN" }
-        //val requiredPermission = "${targetClass.simpleName}.${method.name}"
-        //val userPermissions = permissionRepository.findByUserId(user.id)
-        //return userPermissions.any { it.name == requiredPermission }
+        return user.roles.any { it.name == "ADMIN" }
     }
 }

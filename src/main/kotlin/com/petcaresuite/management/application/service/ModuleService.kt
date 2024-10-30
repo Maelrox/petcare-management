@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service
 @Service
 class ModuleService(
     private val validationService: ModuleDomainService,
-    private val userService: UserService,
     private val modulePersistencePort: ModulePersistencePort,
     private val moduleMapper: ModuleMapper
 ) : ModuleUseCase {

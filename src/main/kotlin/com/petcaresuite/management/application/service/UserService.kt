@@ -1,14 +1,15 @@
 package com.petcaresuite.management.application.service
 
 import com.petcaresuite.management.application.dto.*
+import com.petcaresuite.management.application.mapper.CompanyMapper
 import com.petcaresuite.management.application.mapper.UserMapper
 import com.petcaresuite.management.application.port.input.UserUseCase
-import com.petcaresuite.management.application.port.output.JwtPort
-import com.petcaresuite.management.application.port.output.RolePersistencePort
-import com.petcaresuite.management.application.port.output.UserPersistencePort
+import com.petcaresuite.management.application.port.output.*
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.model.Role
 import com.petcaresuite.management.domain.model.User
+import com.petcaresuite.management.domain.service.CompanyDomainService
+import com.petcaresuite.management.domain.service.RoleDomainService
 import com.petcaresuite.management.domain.service.UserDomainService
 import com.petcaresuite.management.infrastructure.security.UserDetailsService
 import org.springframework.security.core.Authentication
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -23,20 +25,45 @@ class UserService(
     private val userDomainService: UserDomainService,
     private val rolePersistencePort: RolePersistencePort,
     private val userPersistencePort: UserPersistencePort,
+    private val moduleActionPersistencePort: ModulesActionPersistencePort,
     private val passwordEncoder: PasswordEncoder,
     private val userMapper: UserMapper,
     private val jwtPort: JwtPort,
     private val userDetailsService: UserDetailsService,
+    private val companyDomainService: CompanyDomainService,
+    private val companyPersistencePort: CompanyPersistencePort,
+    private val permissionPersistencePort: PermissionPersistencePort,
+    private val roleDomainService: RoleDomainService,
+    private val companyMapper: CompanyMapper,
 ) :
     UserUseCase {
+
+    @Transactional
     override fun register(userRegisterDTO: UserRegisterDTO): AuthenticationResponseDTO {
+
+        //Persist user
         validateUserRegistration(userRegisterDTO)
-        val roles = retrieveRoles(userRegisterDTO.roles!!)
         userRegisterDTO.password = passwordEncoder.encode(userRegisterDTO.password!!)
-        val user = userMapper.toDomain(userRegisterDTO, roles)
+        var user = userMapper.toDomain(userRegisterDTO, emptySet())
+        user = userPersistencePort.save(user)
+
+        //Persist company
+        companyDomainService.validateCreation(userRegisterDTO.company, user)
+        var company = companyMapper.toDomain(userRegisterDTO.company)
+        company = companyPersistencePort.save(company)
+        user.company = company
+
+        //Persist Default Role and Permissions for the admin role
+        val allModuleActions = moduleActionPersistencePort.getAll()
+        var adminPermission = roleDomainService.getDefaultPermission(company, allModuleActions)
+        adminPermission = permissionPersistencePort.save(adminPermission)!!
+        var role = roleDomainService.getDefaultRole(company, allModuleActions, mutableSetOf(adminPermission))
+        role = rolePersistencePort.save(role)!!
+        user.roles = setOf(role)
         userPersistencePort.save(user)
-        val userDetailsDTO = userMapper.toDTO(user)
+
         val (jwtToken, expirationDate) = jwtPort.generateToken(user.username!!)
+        val userDetailsDTO = userMapper.toDTO(user)
         return AuthenticationResponseDTO(
             message = Responses.USER_CREATED,
             token = jwtToken,
@@ -68,10 +95,9 @@ class UserService(
     }
 
     private fun validateUserRegistration(userRegisterDTO: UserRegisterDTO) {
-        if (userRegisterDTO.roles!!.contains("SYSADMIN")) {
-            throw IllegalArgumentException(Responses.REGISTER_AS_SYSADMIN_ERROR)
+        if (userRegisterDTO.roles == null || userRegisterDTO.roles.size != 1 || userRegisterDTO.roles.first() != "ADMIN") {
+            throw IllegalArgumentException(Responses.REGISTER_INVALID_ROLE)
         }
-        userDomainService.validateRoles(userRegisterDTO.roles)
         userDomainService.validatePasswordComplexity(userRegisterDTO.password!!)
         userDomainService.validateUserDoesNotExist(userRegisterDTO.userName!!)
     }
@@ -119,4 +145,4 @@ class UserService(
         return getByUserName(userName)
     }
 
-}
+    }

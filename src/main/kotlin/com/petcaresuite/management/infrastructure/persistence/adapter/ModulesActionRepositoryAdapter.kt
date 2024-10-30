@@ -46,4 +46,9 @@ class ModulesActionRepositoryAdapter(
         return modulesActionMapper.toDomain(modulesAction)
     }
 
+    override fun getAll(): MutableSet<ModulesAction> {
+        return modulesActionMapper.toDomainMutable(jpaModuleActionRepository.findAll())
+
+    }
+
 }

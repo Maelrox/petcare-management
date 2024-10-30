@@ -14,13 +14,11 @@ import org.springframework.web.bind.annotation.*
 class PermissionModulesActionController(private val permissionModulesActionUseCase: PermissionModulesActionUseCase) {
 
     @PostMapping()
-    @Authorize
     fun savePermissionModulesAction(@Valid @RequestBody dto: PermissionModuleActionDTO): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(permissionModulesActionUseCase.save(dto))
     }
 
     @GetMapping("/{permissionId}/{moduleId}")
-    @Authorize
     fun getModuleActions(@PathVariable permissionId: Long, @PathVariable moduleId: Long): ResponseEntity<List<ModulesActionDTO>> {
         return ResponseEntity.ok(permissionModulesActionUseCase.getAllByPermissionIdAndModuleId(permissionId, moduleId))
     }

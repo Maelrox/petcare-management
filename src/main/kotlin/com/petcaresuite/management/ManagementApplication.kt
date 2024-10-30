@@ -6,8 +6,8 @@ import org.springframework.boot.runApplication
 
 @EnableDiscoveryClient
 @SpringBootApplication
-class MicroserviceManagementApplication
+class ManagementApplication
 
 fun main(args: Array<String>) {
-	runApplication<MicroserviceManagementApplication>(*args)
+	runApplication<ManagementApplication>(*args)
 }

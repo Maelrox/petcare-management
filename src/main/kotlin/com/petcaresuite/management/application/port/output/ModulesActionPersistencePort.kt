@@ -16,5 +16,5 @@ interface ModulesActionPersistencePort {
 
     fun getByPermissionIdAndModuleId(permissionId: Long, moduleId: Long): List<ModulesAction>
 
-
+    fun getAll(): MutableSet<ModulesAction>
 }

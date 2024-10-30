@@ -10,7 +10,7 @@ object Responses {
     const val ROLE_NOT_FOUND = "Role %s not found"
     const val USER_AUTHENTICATED = "Authentication successfully"
     const val USER_LOGIN_TOO_MANY_ATTEMPTS = "Too many login attempts"
-    const val REGISTER_AS_SYSADMIN_ERROR = "Invalid Role"
+    const val REGISTER_INVALID_ROLE = "Invalid Role"
 
     const val COMPANY_CREATED = "The company has been created"
     const val COMPANY_UPDATED = "The company has been updated"

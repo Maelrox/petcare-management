@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*
 class RoleController(private val roleUseCase: RoleUseCase) {
 
     @PostMapping()
-    @Authorize
     @PermissionRequired(Modules.ROLES, ModuleActions.CREATE)
     fun saveRole(@Valid @RequestBody dto: RoleDTO, request: HttpServletRequest): ResponseEntity<ResponseDTO> {
         val user = request.getAttribute("user") as UserDetailsDTO
@@ -26,21 +25,18 @@ class RoleController(private val roleUseCase: RoleUseCase) {
     }
 
     @PutMapping()
-    @Authorize
     @PermissionRequired(Modules.ROLES, ModuleActions.UPDATE)
     fun updateRole(@Valid @RequestBody dto: RoleDTO): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(roleUseCase.update(dto))
     }
 
     @DeleteMapping("/{id}")
-    @Authorize
     @PermissionRequired(Modules.ROLES, ModuleActions.DELETE)
     fun deleteRole(@PathVariable id: Long): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(roleUseCase.delete(id))
     }
 
     @GetMapping()
-    @Authorize
     @PermissionRequired(Modules.ROLES, ModuleActions.VIEW)
     fun getAllRolesByFilter(@ModelAttribute filterDTO: RoleFilterDTO, @RequestParam(defaultValue = "0") page: Int, @RequestParam(defaultValue = "30") size: Int): ResponseEntity<PaginatedResponseDTO<RoleDTO>> {
         val pageable = PageRequest.of(page, size)

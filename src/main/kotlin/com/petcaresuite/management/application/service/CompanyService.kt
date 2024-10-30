@@ -16,37 +16,25 @@ import org.springframework.stereotype.Service
 class CompanyService(
     private val companyDomainService: CompanyDomainService,
     private val companyPersistencePort: CompanyPersistencePort,
-    private val userPersistencePort: UserPersistencePort,
     private val companyMapper: CompanyMapper,
     private val userService: UserService
 ) :
     CompanyUseCase {
-    @Transactional
-    override fun save(companyDTO: CompanyDTO): ResponseDTO {
-        val user = userService.getCurrentUser()
-        validateCreation(companyDTO, user)
-        val company = companyMapper.toDomain(companyDTO)
-        val persistedCompany = companyPersistencePort.save(company)
-        user.company = persistedCompany
-        userPersistencePort.save(user)
-        return ResponseDTO(Responses.COMPANY_CREATED)
-    }
 
     @Transactional
-    override fun update(companyDTO: CompanyDTO, companyId: Long): ResponseDTO {
+    override fun update(companyDTO: CompanyDTO): ResponseDTO {
         val user = userService.getCurrentUser()
-        val company = companyPersistencePort.findById(companyId)
-            ?: throw IllegalArgumentException(Responses.COMPANY_IDENTIFICATION_DOESNT_EXIST.format(companyId))
-        validateUpdate(companyDTO, user, company, companyId)
+        val company = companyPersistencePort.findById(user.company!!.id)
+            ?: throw IllegalArgumentException(Responses.COMPANY_IDENTIFICATION_DOESNT_EXIST.format(user.company!!.id))
+        validateUpdate(companyDTO, user, company, user.company!!.id)
         val updatableCompany = setUpdatableFields(companyDTO, company)
         companyPersistencePort.save(updatableCompany)
         return ResponseDTO(Responses.COMPANY_UPDATED)
     }
 
-    private fun validateCreation(companyDTO: CompanyDTO, user: User) {
-        companyDomainService.validateUserCompanyExistence(user)
-        companyDomainService.validateName(companyDTO.name)
-        companyDomainService.validateCompanyIdentification(companyDTO.companyIdentification)
+    override fun get(): CompanyDTO {
+        val user = userService.getCurrentUser()
+        return companyMapper.toDTO(user.company!!)
     }
 
     private fun validateUpdate(companyDTO: CompanyDTO, user: User, company: Company, companyId: Long) {

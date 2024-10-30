@@ -17,10 +17,8 @@ class UserDomainService(
 ) {
 
     fun validateUpdatePermission(userUpdateDTO: UserUpdateDTO) {
-        // TODO: ALLOW COMPANY ADMIN TO UPDATE ANY USER OF THE SAME COMPANY
         val currentUserId: CustomUserDetails =
             SecurityContextHolder.getContext().authentication.principal as CustomUserDetails
-        // TODO: Context shouldn't depend of a single server
         if (currentUserId.getUserId() != userUpdateDTO.id && !SecurityContextHolder.getContext().authentication.authorities.any { it.authority == "SYSADMIN" }) {
             throw IllegalAccessException(Responses.USER_UPDATE_NOT_ALLOWED)
         }

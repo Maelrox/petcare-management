@@ -15,4 +15,7 @@ interface ModulesActionEntityMapper {
 
     fun toDomain(modulesActionEntity: List<ModulesActionEntity>): List<ModulesAction>
 
+    fun toDomainMutable(modulesActionEntity: List<ModulesActionEntity>): MutableSet<ModulesAction>
+
+
 }

@@ -20,7 +20,6 @@ class ModuleController(private val moduleUseCase: ModuleUseCase) {
     }
 
     @GetMapping("/all")
-    @Authorize
     fun getAllModules(): ResponseEntity<List<ModuleDTO>> {
         val result = moduleUseCase.getAll()
         return ResponseEntity.ok(result)

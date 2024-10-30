@@ -9,7 +9,7 @@ data class CompanyDTO(
     @field:Size(min = 3, max = 255, message = Responses.COMPANY_NAME_LENGTH_INVALID)
     val name: String,
     @field:NotNull(message = Responses.COMPANY_COUNTRY_REQUIRED)
-    @field:Size(min = 3, max = 255, message = Responses.COMPANY_COUNTRY_LENGTH_INVALID)
+    @field:Size(min = 2, max = 255, message = Responses.COMPANY_COUNTRY_LENGTH_INVALID)
     val country: String?,
     @field:NotNull(message = Responses.COMPANY_IDENTIFICATION_REQUIRED)
     @field:Size(min = 3, max = 255, message = Responses.COMPANY_IDENTIFICATION_LENGTH_INVALID)

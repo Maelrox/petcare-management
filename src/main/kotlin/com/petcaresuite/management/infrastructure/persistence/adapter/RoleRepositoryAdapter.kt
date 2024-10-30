@@ -16,8 +16,8 @@ class RoleRepositoryAdapter(
     private val roleMapper: RoleEntityMapper
 ) : RolePersistencePort {
     override fun findByName(name: String): Role? {
-        val role = jpaRoleRepository.findByName(name)
-        return roleMapper.toDomain(role!!)
+        val role = jpaRoleRepository.findByName(name) ?: return null
+        return roleMapper.toDomain(role)
     }
 
     override fun save(role: Role): Role? {
