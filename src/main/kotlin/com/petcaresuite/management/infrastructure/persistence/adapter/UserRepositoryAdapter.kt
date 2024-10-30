@@ -4,6 +4,8 @@ import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.domain.model.User
 import com.petcaresuite.management.infrastructure.persistence.mapper.UserEntityMapper
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaUserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import java.util.Optional
 
@@ -43,6 +45,11 @@ class UserRepositoryAdapter(
         } else {
             null
         }
+    }
+
+    override fun findAllByFilterPaginated(filter: User, pageable: Pageable, companyId: Long): Page<User> {
+        val pagedRolesEntity = userRepository.findAllByFilter(filter, pageable, companyId)
+        return pagedRolesEntity.map { userMapper.toDomain(it) }
     }
 
 }
