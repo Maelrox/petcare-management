@@ -2,6 +2,10 @@ package com.petcaresuite.management.interfaces.web
 
 import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.application.port.input.UserUseCase
+import com.petcaresuite.management.application.security.Authorize
+import com.petcaresuite.management.application.service.modules.ModuleActions
+import com.petcaresuite.management.application.service.modules.Modules
+import com.petcaresuite.management.infrastructure.security.PermissionRequired
 
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -19,11 +23,13 @@ class UserController(private val userUseCase: UserUseCase) {
     }
 
     @PutMapping
+    @Authorize
     fun update(@Valid @RequestBody dto: UserUpdateDTO): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(userUseCase.update(dto))
     }
 
     @GetMapping("/token")
+    @Authorize
     fun getUserData(@RequestParam token: String): ResponseEntity<UserDetailsDTO> {
         return ResponseEntity.ok(userUseCase.getByToken(token))
     }

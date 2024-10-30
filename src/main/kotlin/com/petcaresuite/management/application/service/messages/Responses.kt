@@ -11,6 +11,7 @@ object Responses {
     const val USER_AUTHENTICATED = "Authentication successfully"
     const val USER_LOGIN_TOO_MANY_ATTEMPTS = "Too many login attempts"
     const val REGISTER_INVALID_ROLE = "Invalid Role"
+    const val REGISTER_NO_ROLE = "At least one role is required"
 
     const val COMPANY_CREATED = "The company has been created"
     const val COMPANY_UPDATED = "The company has been updated"

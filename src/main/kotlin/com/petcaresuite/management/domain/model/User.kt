@@ -14,5 +14,6 @@
         var lastModified: LocalDateTime?,
         val createdDate: LocalDateTime?,
         var company: Company?,
-        var roles: Set<Role>
+        var roles: Set<Role>,
+        var companyId: Long?
     )
