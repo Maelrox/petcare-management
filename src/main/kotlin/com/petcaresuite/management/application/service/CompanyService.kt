@@ -37,6 +37,12 @@ class CompanyService(
         return companyMapper.toDTO(user.company!!)
     }
 
+    override fun getDashBoard(): CompanyDashboardDTO? {
+        val user = userService.getCurrentUser()
+        val company = companyPersistencePort.findById(user.company!!.id)
+        return getCompanyResume(company!!.id)
+    }
+
     private fun validateUpdate(companyDTO: CompanyDTO, user: User, company: Company, companyId: Long) {
         companyDomainService.validateUserCompanyAccess(user, companyId)
         if (company.name != companyDTO.name) {
@@ -55,5 +61,25 @@ class CompanyService(
             country = companyDTO.country
         )
     }
+
+    fun getCompanyResume(companyId: Long): CompanyDashboardDTO {
+        val ownerTrends = companyDomainService.getOwnerTrends(companyId)
+        val ownerChartData = companyDomainService.getOwnerChartData(companyId)
+        val attentionsTrend = companyDomainService.getConsultationTrends(companyId)
+        val inventorySales = companyDomainService.getInventorySales(companyId)
+
+        return CompanyDashboardDTO(
+            totalCustomers = ownerTrends.totalOwners,
+            customersTrend = ownerTrends.customersTrend,
+            chartData = ownerChartData,
+            totalAttentions = attentionsTrend.totalAttentions,
+            attentionsTrend = attentionsTrend.attentionsTrend,
+            inventorySales = inventorySales,
+            inventoryTrend = attentionsTrend.attentionsTrend,
+            todayAppointments = 0,
+            todayAppointmentsTrend = attentionsTrend.attentionsTrend,
+        )
+    }
+
 
 }

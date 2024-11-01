@@ -1,6 +1,7 @@
 package com.petcaresuite.management.interfaces.web
 
 import com.petcaresuite.management.application.dto.CompanyDTO
+import com.petcaresuite.management.application.dto.CompanyDashboardDTO
 import com.petcaresuite.management.application.dto.ResponseDTO
 import com.petcaresuite.management.application.port.input.CompanyUseCase
 import com.petcaresuite.management.application.security.Authorize
@@ -22,6 +23,12 @@ class CompanyController(private val companyUseCase: CompanyUseCase) {
     @Authorize
     fun getCompany(): ResponseEntity<CompanyDTO> {
         return ResponseEntity.ok(companyUseCase.get())
+    }
+
+    @GetMapping("/dashboard")
+    @Authorize
+    fun getCompanyDashboard(): ResponseEntity<CompanyDashboardDTO> {
+        return ResponseEntity.ok(companyUseCase.getDashBoard())
     }
 
 }

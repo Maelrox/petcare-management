@@ -7,4 +7,6 @@ interface CompanyUseCase {
     fun update(companyDTO: CompanyDTO): ResponseDTO
 
     fun get(): CompanyDTO
+
+    fun getDashBoard(): CompanyDashboardDTO?
 }
