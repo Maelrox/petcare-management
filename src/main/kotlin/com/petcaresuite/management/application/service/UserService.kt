@@ -102,14 +102,6 @@ class UserService(
         userDomainService.validateUserDoesNotExist(userRegisterDTO.userName!!)
     }
 
-    private fun validateUserEmployeeRegistration(userRegisterDTO: EmployeeRegisterDTO) {
-        if (userRegisterDTO.roles.isNullOrEmpty() || userRegisterDTO.roles.first() == "ADMIN") {
-            throw IllegalArgumentException(Responses.REGISTER_INVALID_ROLE)
-        }
-        userDomainService.validatePasswordComplexity(userRegisterDTO.password!!)
-        userDomainService.validateUserDoesNotExist(userRegisterDTO.userName!!)
-    }
-
     private fun validateUserUpdate(userUpdateDTO: UserUpdateDTO) {
         userDomainService.validateUpdatePermission(userUpdateDTO)
         userDomainService.validateRoles(userUpdateDTO.roles)

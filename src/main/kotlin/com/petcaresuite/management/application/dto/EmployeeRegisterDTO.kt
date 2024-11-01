@@ -6,7 +6,7 @@ data class EmployeeRegisterDTO(
     val id: Long?,
     @field:NotNull(message = "Username is required")
     @field:Size(min = 1, max = 255, message = "Username length must be between 1 and 255 characters")
-    val userName: String?,
+    val username: String?,
 
     @field:NotNull(message = "Password is required")
     @field:Size(min = 8, max = 255, message = "Password length must be between 8 and 255 characters")
@@ -18,7 +18,7 @@ data class EmployeeRegisterDTO(
     val email: String?,
 
     @field:NotEmpty(message = "At least one role must be specified")
-    val roles: Set<String>?,
+    var roles: String,
 
     @field:NotEmpty(message = "Name required")
     val name: String?,

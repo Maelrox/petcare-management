@@ -8,6 +8,7 @@ import com.petcaresuite.management.application.service.modules.Modules
 import com.petcaresuite.management.infrastructure.security.PermissionRequired
 
 import jakarta.validation.Valid
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -24,9 +25,30 @@ class EmployeeController(private val employeeUseCase: EmployeeUseCase) {
     }
 
     @PostMapping()
-    @PermissionRequired(Modules.ROLES, ModuleActions.DELETE)
+    @Authorize
     fun registerEmployee(@Valid @RequestBody dto: EmployeeRegisterDTO): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(employeeUseCase.register(dto))
+    }
+
+    @GetMapping()
+    @Authorize
+    fun getAllRolesByFilter(@ModelAttribute filterDTO: EmployeeFilterDTO, @RequestParam(defaultValue = "0") page: Int, @RequestParam(defaultValue = "30") size: Int): ResponseEntity<PaginatedResponseDTO<UserDetailsDTO>> {
+        val pageable = PageRequest.of(page, size)
+        val result = employeeUseCase.getAllByFilter(filterDTO, pageable)
+
+        val pageDTO = PageDTO(
+            page = result.number,
+            size = result.size,
+            totalElements = result.totalElements,
+            totalPages = result.totalPages
+        )
+
+        val paginatedResponse = PaginatedResponseDTO(
+            data = result.content,
+            pagination = pageDTO
+        )
+
+        return ResponseEntity.ok(paginatedResponse)
     }
 
 }

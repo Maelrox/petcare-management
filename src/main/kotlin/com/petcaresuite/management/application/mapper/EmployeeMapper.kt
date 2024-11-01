@@ -13,7 +13,7 @@ import org.mapstruct.Mappings
 interface EmployeeMapper {
     @Mappings(
         Mapping(target = "id", ignore = true),
-        Mapping(target = "username", source = "employeeRegisterDTO.userName"),
+        Mapping(target = "username", source = "employeeRegisterDTO.username"),
         Mapping(target = "password", source = "employeeRegisterDTO.password"),
         Mapping(target = "email", source = "employeeRegisterDTO.email"),
         Mapping(target = "name", source = "employeeRegisterDTO.name"),
@@ -28,7 +28,7 @@ interface EmployeeMapper {
     fun toDomain(employeeRegisterDTO: EmployeeRegisterDTO, roles: Set<Role>): User
 
     @Mappings(
-        Mapping(target = "id", ignore = true),
+        Mapping(target = "id", source = "user.id"),
         Mapping(target = "email", source = "user.email"),
         Mapping(target = "name", source = "user.name"),
         Mapping(target = "enabled", source = "user.enabled"),

@@ -26,15 +26,18 @@ class EmployeeService(
     private val passwordEncoder: PasswordEncoder,
     private val employeeMapper: EmployeeMapper,
     private val employeeDomainService: EmployeeDomainService,
+    private val userService: UserService,
 ) :
     EmployeeUseCase {
 
     override fun register(employeeRegisterDTO: EmployeeRegisterDTO): ResponseDTO {
         validateEmployeeRegistration(employeeRegisterDTO)
-        userDomainService.validateRoles(employeeRegisterDTO.roles)
-        val roles = retrieveRoles(employeeRegisterDTO.roles!!)
+        userDomainService.validateRoles(setOf(employeeRegisterDTO.roles))
+        val roles = retrieveRoles(setOf(employeeRegisterDTO.roles))
         employeeRegisterDTO.password = passwordEncoder.encode(employeeRegisterDTO.password!!)
         val user = employeeMapper.toDomain(employeeRegisterDTO, roles)
+        val userAdmin = userService.getCurrentUser()
+        user.company = userAdmin.company
         userPersistencePort.save(user)
         return ResponseDTO(
             message = Responses.USER_CREATED,
@@ -56,25 +59,25 @@ class EmployeeService(
             .orElseThrow { IllegalArgumentException(Responses.USER_NOT_VALID) }
     }
 
-    override fun getAllByFilter(filterDTO: EmployeeFilterDTO, companyId: Long, pageable: Pageable): Page<UserDetailsDTO> {
+    override fun getAllByFilter(filterDTO: EmployeeFilterDTO, pageable: Pageable): Page<UserDetailsDTO> {
         val user = getCurrentUser()
         val filter = employeeMapper.filterToDomain(filterDTO)
-        filter.companyId =companyId
+        filter.companyId = user.company!!.id
         return userPersistencePort.findAllByFilterPaginated(filter, pageable, user.company!!.id).map { employeeMapper.toDTO(it) }
     }
 
     private fun validateEmployeeRegistration(employeeRegisterDTO: EmployeeRegisterDTO) {
-        if (employeeRegisterDTO.roles.isNullOrEmpty()) {
+        if (employeeRegisterDTO.roles.isEmpty()) {
             throw IllegalArgumentException(Responses.REGISTER_NO_ROLE)
         }
         employeeDomainService.validatePasswordComplexity(employeeRegisterDTO.password!!)
-        employeeDomainService.validateUserDoesNotExist(employeeRegisterDTO.userName!!)
+        employeeDomainService.validateUserDoesNotExist(employeeRegisterDTO.username!!)
     }
 
-    private fun validateEmployeeUpdate(userUpdateDTO: EmployeeRegisterDTO) {
-        employeeDomainService.validateUpdatePermission(userUpdateDTO)
-        employeeDomainService.validateRoles(userUpdateDTO.roles)
-        employeeDomainService.validatePasswordComplexity(userUpdateDTO.password!!)
+    private fun validateEmployeeUpdate(employeeUpdateDTO: EmployeeRegisterDTO) {
+        employeeDomainService.validateUpdatePermission(employeeUpdateDTO)
+        employeeDomainService.validateRoles(setOf(employeeUpdateDTO.roles))
+        employeeDomainService.validatePasswordComplexity(employeeUpdateDTO.password!!)
     }
 
     private fun retrieveRoles(roles: Set<String>): Set<Role> {
@@ -85,7 +88,7 @@ class EmployeeService(
 
     private fun setUpdatableFields(employeeRegisterDTO: EmployeeRegisterDTO, user: User) {
         user.password = employeeRegisterDTO.password
-        val roles = retrieveRoles(employeeRegisterDTO.roles!!)
+        val roles = retrieveRoles(setOf(employeeRegisterDTO.roles))
         user.roles = roles
         user.country = employeeRegisterDTO.country
         user.enabled = employeeRegisterDTO.enabled!!

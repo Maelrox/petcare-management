@@ -13,6 +13,6 @@ interface EmployeeUseCase {
 
     fun getByUserName(username: String): User
 
-    fun getAllByFilter(filterDTO: EmployeeFilterDTO, companyId: Long, pageable: Pageable): Page<UserDetailsDTO>
+    fun getAllByFilter(filterDTO: EmployeeFilterDTO, pageable: Pageable): Page<UserDetailsDTO>
 
 }

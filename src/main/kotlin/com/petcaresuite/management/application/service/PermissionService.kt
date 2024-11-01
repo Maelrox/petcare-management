@@ -109,11 +109,11 @@ class PermissionService(
     }
 
     override fun hasPermission(user: User, module: String, action: String): Boolean {
-        if (user.roles.isEmpty()) return false
+        if (user.roles!!.isEmpty()) return false
         val moduleEntity = modulePersistencePort.findByName(module) ?: return false
         val actionId = moduleEntity.modulesActionEntities!!.find { it.name == action }?.id ?: return false
 
-        return user.roles.any { role ->
+        return user.roles!!.any { role ->
             role.permissions?.flatMap { it.modulesAction ?: emptyList() }?.any { it.id == actionId } == true
         }
     }

@@ -28,7 +28,7 @@ interface JpaUserRepository : JpaRepository<UserEntity, Long> {
     @Query(
         """SELECT u FROM UserEntity u
             WHERE u.company.id = :#{#companyId} 
-            AND (:#{#filter.name} IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', :#{#u.name}, '%'))) 
+            AND (:#{#filter.name} IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', :#{#filter.name}, '%'))) 
             ORDER by u.id desc 
         """
     )
