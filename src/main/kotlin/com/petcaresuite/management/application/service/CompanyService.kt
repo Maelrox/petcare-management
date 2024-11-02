@@ -63,21 +63,23 @@ class CompanyService(
     }
 
     fun getCompanyResume(companyId: Long): CompanyDashboardDTO {
+
         val ownerTrends = companyDomainService.getOwnerTrends(companyId)
-        val ownerChartData = companyDomainService.getOwnerChartData(companyId)
         val attentionsTrend = companyDomainService.getConsultationTrends(companyId)
         val inventorySales = companyDomainService.getInventorySales(companyId)
+        val appointmentsTrend = companyDomainService.getAppointmentsToday(companyId)
+        val patientChartData = companyDomainService.getPatientChartData(companyId)
 
         return CompanyDashboardDTO(
             totalCustomers = ownerTrends.totalOwners,
             customersTrend = ownerTrends.customersTrend,
-            chartData = ownerChartData,
+            chartData = patientChartData,
             totalAttentions = attentionsTrend.totalAttentions,
             attentionsTrend = attentionsTrend.attentionsTrend,
             inventorySales = inventorySales,
             inventoryTrend = attentionsTrend.attentionsTrend,
-            todayAppointments = 0,
-            todayAppointmentsTrend = attentionsTrend.attentionsTrend,
+            todayAppointments = appointmentsTrend.totalAppointments,
+            todayAppointmentsTrend = appointmentsTrend.appointmentsTrend
         )
     }
 

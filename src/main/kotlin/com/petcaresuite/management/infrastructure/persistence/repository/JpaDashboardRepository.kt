@@ -136,6 +136,137 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
         }, companyId) ?: InventorySalesDTO(0.0, "COP")
     }
 
+    fun getTodayAppointments(companyId: Long): Int {
+        return jdbcTemplate.queryForObject("""
+            SELECT COUNT(*) as total_appointments
+            FROM appointments 
+            WHERE company_id = ?
+            AND DATE_TRUNC('day', appointment_date) = DATE_TRUNC('day', CURRENT_DATE)
+        """, Int::class.java, companyId) ?: 0
+    }
+
+    fun getPreviousDayAppointments(companyId: Long): Int {
+        return jdbcTemplate.queryForObject("""
+            SELECT COUNT(*) as total_appointments
+            FROM appointments 
+            WHERE company_id = ?
+            AND DATE_TRUNC('day', appointment_date) = DATE_TRUNC('day', CURRENT_DATE - INTERVAL '1 day')
+        """, Int::class.java, companyId) ?: 0
+    }
+
+    fun getAppointmentsTrend(companyId: Long): AppointmentTrendDTO {
+        val sql = """
+            WITH current_day AS (
+                SELECT COUNT(*) as count
+                FROM appointments 
+                WHERE company_id = ?
+                AND DATE_TRUNC('day', appointment_date) = DATE_TRUNC('day', CURRENT_DATE)
+            ),
+            previous_day AS (
+                SELECT COUNT(*) as count
+                FROM appointments 
+                WHERE company_id = ?
+                AND DATE_TRUNC('day', appointment_date) = DATE_TRUNC('day', CURRENT_DATE - INTERVAL '1 day')
+            )
+            SELECT 
+                COALESCE(cd.count, 0) as current_count,
+                COALESCE(pd.count, 0) as previous_count
+            FROM current_day cd
+            CROSS JOIN previous_day pd
+        """
+
+        return jdbcTemplate.queryForObject(sql, { rs, _ ->
+            val current = rs.getInt("current_count")
+            val previous = rs.getInt("previous_count")
+            val trend = calculateTrend(current, previous)
+
+            AppointmentTrendDTO(
+                totalAppointments = current,
+                appointmentsTrend = TrendDTO(
+                    percentage = trend,
+                    period = "yesterday"
+                )
+            )
+        }, companyId, companyId) ?: AppointmentTrendDTO(0, TrendDTO(0.0, "yesterday"))
+    }
+
+    fun getMonthlyPatients(companyId: Long): List<MonthlyPatientCount> {
+        return jdbcTemplate.query("""
+            SELECT 
+                DATE_TRUNC('month', p.created_at::timestamp)::DATE as month_date,
+                COUNT(*) as total_patients
+            FROM patients p
+            JOIN owners o ON p.owner_id = o.owner_id
+            WHERE o.company_id = ?
+            AND p.created_at::timestamp >= CURRENT_DATE - INTERVAL '6 months'
+            GROUP BY DATE_TRUNC('month', p.created_at::timestamp)
+            ORDER BY month_date DESC
+        """, { rs, _ ->
+            MonthlyPatientCount(
+                monthDate = rs.getDate("month_date").toLocalDate(),
+                totalPatients = rs.getInt("total_patients")
+            )
+        }, companyId)
+    }
+
+    fun getCurrentMonthPatients(companyId: Long): Int {
+        return jdbcTemplate.queryForObject("""
+            SELECT COUNT(*) as total_patients
+            FROM patients p
+            JOIN owners o ON p.owner_id = o.owner_id
+            WHERE o.company_id = ?
+            AND DATE_TRUNC('month', p.created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE)
+        """, Int::class.java, companyId) ?: 0
+    }
+
+    fun getPreviousMonthPatients(companyId: Long): Int {
+        return jdbcTemplate.queryForObject("""
+            SELECT COUNT(*) as total_patients
+            FROM patients p
+            JOIN owners o ON p.owner_id = o.owner_id
+            WHERE o.company_id = ?
+            AND DATE_TRUNC('month', p.created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+        """, Int::class.java, companyId) ?: 0
+    }
+
+    fun getPatientTrends(companyId: Long): PatientTrendDTO {
+        val sql = """
+            WITH current_month AS (
+                SELECT COUNT(*) as count
+                FROM patients p
+                JOIN owners o ON p.owner_id = o.owner_id
+                WHERE o.company_id = ?
+                AND DATE_TRUNC('month', p.created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE)
+            ),
+            previous_month AS (
+                SELECT COUNT(*) as count
+                FROM patients p
+                JOIN owners o ON p.owner_id = o.owner_id
+                WHERE o.company_id = ?
+                AND DATE_TRUNC('month', p.created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+            )
+            SELECT 
+                COALESCE(cm.count, 0) as current_count,
+                COALESCE(pm.count, 0) as previous_count
+            FROM current_month cm
+            CROSS JOIN previous_month pm
+        """
+
+        return jdbcTemplate.queryForObject(sql, { rs, _ ->
+            val current = rs.getInt("current_count")
+            val previous = rs.getInt("previous_count")
+            val trend = calculateTrend(current, previous)
+
+            PatientTrendDTO(
+                totalPatients = current,
+                patientsTrend = TrendDTO(
+                    percentage = trend,
+                    period = "last month"
+                )
+            )
+        }, companyId, companyId) ?: PatientTrendDTO(0, TrendDTO(0.0, "last month"))
+    }
+
     private fun calculateTrend(current: Int, previous: Int): Double {
         if (previous == 0) return 0.0
         return ((current - previous).toDouble() / previous * 100)

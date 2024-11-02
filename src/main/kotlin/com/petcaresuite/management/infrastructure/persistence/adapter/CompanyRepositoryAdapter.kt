@@ -1,9 +1,6 @@
 package com.petcaresuite.management.infrastructure.persistence.adapter
 
-import com.petcaresuite.management.application.dto.ConsultationTrendDTO
-import com.petcaresuite.management.application.dto.InventorySalesDTO
-import com.petcaresuite.management.application.dto.MonthlyConsultationCount
-import com.petcaresuite.management.application.dto.MonthlyOwnerCount
+import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.application.port.output.CompanyPersistencePort
 import com.petcaresuite.management.domain.model.Company
 import com.petcaresuite.management.infrastructure.persistence.mapper.CompanyEntityMapper
@@ -60,6 +57,18 @@ class CompanyRepositoryAdapter(
 
     override fun getInventorySales(companyId: Long): InventorySalesDTO {
         return dashboardRepository.getInventorySales(companyId)
+    }
+
+    override fun getAppointmentsTrend(companyId: Long): AppointmentTrendDTO {
+        return dashboardRepository.getAppointmentsTrend(companyId)
+    }
+
+    override fun getMonthlyPatients(companyId: Long): List<MonthlyPatientCount> {
+        return dashboardRepository.getMonthlyPatients(companyId)
+    }
+
+    override fun getPatientTrends(companyId: Long): PatientTrendDTO {
+        return dashboardRepository.getPatientTrends(companyId)
     }
 
 }

@@ -1,12 +1,10 @@
 package com.petcaresuite.management.application.port.output
 
-import com.petcaresuite.management.application.dto.ConsultationTrendDTO
-import com.petcaresuite.management.application.dto.InventorySalesDTO
-import com.petcaresuite.management.application.dto.MonthlyConsultationCount
-import com.petcaresuite.management.application.dto.MonthlyOwnerCount
+import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.domain.model.Company
 
 interface CompanyPersistencePort {
+
     fun save(company: Company): Company
 
     fun findCompanyByIdentification(id: String): Company?
@@ -26,5 +24,11 @@ interface CompanyPersistencePort {
     fun getAllConsultationTrends(companyId: Long): ConsultationTrendDTO
 
     fun getInventorySales(companyId: Long): InventorySalesDTO
+
+    fun getAppointmentsTrend(companyId: Long): AppointmentTrendDTO
+
+    fun getMonthlyPatients(companyId: Long): List<MonthlyPatientCount>
+
+    fun getPatientTrends(companyId: Long): PatientTrendDTO
 
 }

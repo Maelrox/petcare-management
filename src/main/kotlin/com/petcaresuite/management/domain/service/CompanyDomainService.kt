@@ -57,11 +57,11 @@ class CompanyDomainService(
 
     fun getOwnerChartData(companyId: Long): List<ChartDataDTO> {
         return companyPersistencePort.getMonthlyOwners(companyId).map { monthData ->
-                ChartDataDTO(
-                    label = monthData.monthDate.format(DateTimeFormatter.ofPattern("MMM yyyy")),
-                    value = monthData.totalOwners.toDouble()
-                )
-            }
+            ChartDataDTO(
+                label = monthData.monthDate.format(DateTimeFormatter.ofPattern("MMM yyyy")),
+                value = monthData.totalOwners.toDouble()
+            )
+        }
     }
 
     private fun calculateTrend(current: Int, previous: Int): Double {
@@ -87,8 +87,26 @@ class CompanyDomainService(
             }
     }
 
+    fun getPatientTrends(companyId: Long): PatientTrendDTO {
+        return companyPersistencePort.getPatientTrends(companyId)
+    }
+
+    fun getPatientChartData(companyId: Long): List<ChartDataDTO> {
+        return companyPersistencePort.getMonthlyPatients(companyId)
+            .map { monthData ->
+                ChartDataDTO(
+                    label = monthData.monthDate.format(DateTimeFormatter.ofPattern("MMM yyyy")),
+                    value = monthData.totalPatients.toDouble()
+                )
+            }
+    }
+
     fun getInventorySales(companyId: Long): InventorySalesDTO {
         return companyPersistencePort.getInventorySales(companyId)
+    }
+
+    fun getAppointmentsToday(companyId: Long): AppointmentTrendDTO {
+        return companyPersistencePort.getAppointmentsTrend(companyId)
     }
 
 
