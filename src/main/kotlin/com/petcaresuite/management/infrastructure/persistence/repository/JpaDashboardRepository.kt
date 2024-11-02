@@ -44,24 +44,6 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
         }, companyId)
     }
 
-    fun getCurrentMonthConsultations(companyId: Int): Int {
-        return jdbcTemplate.queryForObject("""
-            SELECT COUNT(*) as total_consultations
-            FROM consultations 
-            WHERE company_id = ?
-            AND DATE_TRUNC('month', consultation_date) = DATE_TRUNC('month', CURRENT_DATE)
-        """, Int::class.java, companyId) ?: 0
-    }
-
-    fun getPreviousMonthConsultations(companyId: Int): Int {
-        return jdbcTemplate.queryForObject("""
-            SELECT COUNT(*) as total_consultations
-            FROM consultations 
-            WHERE company_id = ?
-            AND DATE_TRUNC('month', consultation_date) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
-        """, Int::class.java, companyId) ?: 0
-    }
-
     fun getMonthlyConsultations(companyId: Long): List<MonthlyConsultationCount> {
         return jdbcTemplate.query("""
             SELECT 
@@ -124,7 +106,7 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
         JOIN billing_details bd ON b.billing_id = bd.billing_id
         JOIN inventory i ON bd.inventory_id = i.inventory_id
         WHERE b.company_id = ?
-        AND b.transaction_type = 'SALE'
+        AND b.transaction_type = 'BILL'
         AND b.transaction_date >= DATE_TRUNC('month', CURRENT_DATE)
     """
 
@@ -134,24 +116,6 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
                 currency = "COP"
             )
         }, companyId) ?: InventorySalesDTO(0.0, "COP")
-    }
-
-    fun getTodayAppointments(companyId: Long): Int {
-        return jdbcTemplate.queryForObject("""
-            SELECT COUNT(*) as total_appointments
-            FROM appointments 
-            WHERE company_id = ?
-            AND DATE_TRUNC('day', appointment_date) = DATE_TRUNC('day', CURRENT_DATE)
-        """, Int::class.java, companyId) ?: 0
-    }
-
-    fun getPreviousDayAppointments(companyId: Long): Int {
-        return jdbcTemplate.queryForObject("""
-            SELECT COUNT(*) as total_appointments
-            FROM appointments 
-            WHERE company_id = ?
-            AND DATE_TRUNC('day', appointment_date) = DATE_TRUNC('day', CURRENT_DATE - INTERVAL '1 day')
-        """, Int::class.java, companyId) ?: 0
     }
 
     fun getAppointmentsTrend(companyId: Long): AppointmentTrendDTO {
@@ -209,26 +173,6 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
         }, companyId)
     }
 
-    fun getCurrentMonthPatients(companyId: Long): Int {
-        return jdbcTemplate.queryForObject("""
-            SELECT COUNT(*) as total_patients
-            FROM patients p
-            JOIN owners o ON p.owner_id = o.owner_id
-            WHERE o.company_id = ?
-            AND DATE_TRUNC('month', p.created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE)
-        """, Int::class.java, companyId) ?: 0
-    }
-
-    fun getPreviousMonthPatients(companyId: Long): Int {
-        return jdbcTemplate.queryForObject("""
-            SELECT COUNT(*) as total_patients
-            FROM patients p
-            JOIN owners o ON p.owner_id = o.owner_id
-            WHERE o.company_id = ?
-            AND DATE_TRUNC('month', p.created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
-        """, Int::class.java, companyId) ?: 0
-    }
-
     fun getPatientTrends(companyId: Long): PatientTrendDTO {
         val sql = """
             WITH current_month AS (
@@ -265,6 +209,48 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
                 )
             )
         }, companyId, companyId) ?: PatientTrendDTO(0, TrendDTO(0.0, "last month"))
+    }
+
+    fun getInventoryTrends(companyId: Long): InventoryTrendDTO {
+        val sql = """
+        WITH current_month AS (
+            SELECT COALESCE(SUM(b.total_amount), 0.0) as total_sales_amount
+            FROM billing b
+            JOIN billing_details bd ON b.billing_id = bd.billing_id
+            JOIN inventory i ON bd.inventory_id = i.inventory_id
+            WHERE b.company_id = ?
+            AND b.transaction_type = 'BILL'
+            AND DATE_TRUNC('month', b.transaction_date) = DATE_TRUNC('month', CURRENT_DATE)
+        ),
+        previous_month AS (
+            SELECT COALESCE(SUM(b.total_amount), 0.0) as total_sales_amount
+            FROM billing b
+            JOIN billing_details bd ON b.billing_id = bd.billing_id
+            JOIN inventory i ON bd.inventory_id = i.inventory_id
+            WHERE b.company_id = ?
+            AND b.transaction_type = 'BILL'
+            AND DATE_TRUNC('month', b.transaction_date) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+        )
+        SELECT 
+            cm.total_sales_amount as current_sales,
+            pm.total_sales_amount as previous_sales
+        FROM current_month cm
+        CROSS JOIN previous_month pm
+    """
+
+        return jdbcTemplate.queryForObject(sql, { rs, _ ->
+            val currentSales = rs.getInt("current_sales")
+            val previousSales = rs.getInt("previous_sales")
+            val trend = calculateTrend(currentSales, previousSales)
+
+            InventoryTrendDTO(
+                totalInventory = currentSales,
+                inventoryTrend = TrendDTO(
+                    percentage = trend,
+                    period = "last month"
+                )
+            )
+        }, companyId, companyId) ?: InventoryTrendDTO(0, TrendDTO(0.0, "last month"))
     }
 
     private fun calculateTrend(current: Int, previous: Int): Double {

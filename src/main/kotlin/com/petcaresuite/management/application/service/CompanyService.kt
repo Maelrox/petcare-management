@@ -67,6 +67,8 @@ class CompanyService(
         val ownerTrends = companyDomainService.getOwnerTrends(companyId)
         val attentionsTrend = companyDomainService.getConsultationTrends(companyId)
         val inventorySales = companyDomainService.getInventorySales(companyId)
+        val inventoryTrend = companyDomainService.getInventoryTrends(companyId)
+
         val appointmentsTrend = companyDomainService.getAppointmentsToday(companyId)
         val patientChartData = companyDomainService.getPatientChartData(companyId)
 

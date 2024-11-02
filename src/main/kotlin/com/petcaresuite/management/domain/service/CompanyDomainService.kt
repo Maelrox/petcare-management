@@ -109,5 +109,9 @@ class CompanyDomainService(
         return companyPersistencePort.getAppointmentsTrend(companyId)
     }
 
+    fun getInventoryTrends(companyId: Long): InventoryTrendDTO {
+        return companyPersistencePort.getInventoryTrend(companyId)
+    }
+
 
 }

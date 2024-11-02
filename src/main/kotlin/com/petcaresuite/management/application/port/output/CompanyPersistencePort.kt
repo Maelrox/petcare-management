@@ -31,4 +31,6 @@ interface CompanyPersistencePort {
 
     fun getPatientTrends(companyId: Long): PatientTrendDTO
 
+    fun getInventoryTrend(companyId: Long): InventoryTrendDTO
+
 }

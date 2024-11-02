@@ -71,4 +71,8 @@ class CompanyRepositoryAdapter(
         return dashboardRepository.getPatientTrends(companyId)
     }
 
+    override fun getInventoryTrend(companyId: Long): InventoryTrendDTO {
+        return dashboardRepository.getInventoryTrends(companyId)
+    }
+
 }
