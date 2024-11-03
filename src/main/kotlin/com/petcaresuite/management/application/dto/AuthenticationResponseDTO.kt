@@ -6,7 +6,7 @@ data class AuthenticationResponseDTO(
     var message: String?,
     var token: String? = null,
     val expirationDate: Date,
-    var userDetailsDTO: UserDetailsDTO,
+    var userDetails: UserDetailsDTO,
 ) {
 
 

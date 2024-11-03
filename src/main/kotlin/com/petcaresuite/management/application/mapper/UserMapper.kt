@@ -1,12 +1,14 @@
 package com.petcaresuite.management.application.mapper
 
-import com.petcaresuite.management.application.dto.UserDetailsDTO
-import com.petcaresuite.management.application.dto.UserRegisterDTO
+import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.domain.model.Role
 import com.petcaresuite.management.domain.model.User
+import com.petcaresuite.management.infrastructure.persistence.entity.ModulesActionEntity
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Mappings
+import org.mapstruct.Named
+import org.mapstruct.Qualifier
 
 @Mapper(componentModel = "spring")
 interface UserMapper {
@@ -39,5 +41,20 @@ interface UserMapper {
     fun toDTO(user: User): UserDetailsDTO
 
     fun toDomain(userRegisterDTO: UserDetailsDTO): User
+
+    @Mappings(
+        Mapping(target = "id", ignore = true),
+        Mapping(target = "roles", ignore = true),
+        Mapping(target = "moduleActions", ignore = true),
+        Mapping(source = "user.email", target = "email"),
+        Mapping(source = "user.name", target = "name"),
+        Mapping(source = "user.enabled", target = "enabled"),
+        Mapping(target = "actions", source= "actions"),
+        Mapping(source = "user.country", target = "country"),
+        Mapping(source = "user.phone", target = "phone"),
+        Mapping(source = "user.company.id", target = "companyId"),
+        Mapping(source = "user.username", target = "username")
+    )
+    fun toLoginDTO(user: User, actions: List<ModulesActionEntity>): UserDetailsDTO
 
 }

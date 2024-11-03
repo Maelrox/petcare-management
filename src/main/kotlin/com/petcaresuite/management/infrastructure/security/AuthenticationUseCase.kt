@@ -10,6 +10,8 @@ import com.petcaresuite.management.application.security.LoginAttemptUseCase
 import com.petcaresuite.management.application.mapper.UserMapper
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.application.security.CustomUserDetails
+import com.petcaresuite.management.infrastructure.persistence.repository.JpaModuleActionRepository
+import com.petcaresuite.management.infrastructure.persistence.repository.JpaPermissionRepository
 import jakarta.transaction.Transactional
 
 @Service
@@ -18,6 +20,7 @@ class AuthenticationUseCase(
     private val authenticationManager: AuthenticationManager,
     private val loggingAttemptService: LoginAttemptUseCase,
     private val userMapper: UserMapper,
+    private val jpaModuleActionRepository: JpaModuleActionRepository,
 ) : AuthenticationUseCase {
 
     @Transactional
@@ -33,12 +36,19 @@ class AuthenticationUseCase(
         val customPrincipal = authenticationResponse.principal as CustomUserDetails
         val user = customPrincipal.user
         val (jwtToken, expirationDate) = jwtService.generateToken(user.username!!)
-        val userDetailsDTO = userMapper.toDTO(user)
+
+        val moduleActionIds = user.roles!!
+            .flatMap { role -> role.permissions!! }
+            .flatMap { permission -> permission.modulesAction!! }
+            .map { moduleAction -> moduleAction.id }
+            .toSet()
+        val moduleActions = jpaModuleActionRepository.findAllById(moduleActionIds)
+        val userDetailsDTO = userMapper.toLoginDTO(user, moduleActions)
         return AuthenticationResponseDTO(
             message = Responses.USER_AUTHENTICATED,
             token = jwtToken,
             expirationDate = expirationDate,
-            userDetailsDTO = userDetailsDTO
+            userDetails = userDetailsDTO
         )
     }
 }

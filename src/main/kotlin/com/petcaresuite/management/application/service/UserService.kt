@@ -68,7 +68,7 @@ class UserService(
             message = Responses.USER_CREATED,
             token = jwtToken,
             expirationDate = expirationDate,
-            userDetailsDTO = userDetailsDTO
+            userDetails = userDetailsDTO
         )
     }
 

@@ -12,5 +12,8 @@ data class UserDetailsDTO(
     val country: String?,
     val enabled: Boolean?,
     val companyId: Long?,
-    val roles: Set<RoleDTO>?
-    )
+    val roles: Set<RoleDTO>?,
+    val moduleActions: Set<ModulesActionDTO>?,
+    val actions: Set<ModulesActionSimple>?
+
+)
