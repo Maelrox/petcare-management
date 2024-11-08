@@ -16,10 +16,10 @@ class EmployeeDomainService(
     private val rolePersistencePort: RolePersistencePort,
 ) {
 
-    fun validateUpdatePermission(userUpdateDTO: EmployeeRegisterDTO) {
+    fun validateUpdatePermission(employeeRegisterDTO: EmployeeRegisterDTO) {
         val currentUserId: CustomUserDetails =
             SecurityContextHolder.getContext().authentication.principal as CustomUserDetails
-        if (currentUserId.getUserId() != userUpdateDTO.id && !SecurityContextHolder.getContext().authentication.authorities.any { it.authority == "SYSADMIN" }) {
+        if (currentUserId.getUserId() != employeeRegisterDTO.id && !SecurityContextHolder.getContext().authentication.authorities.any { it.authority == "ADMIN" }) {
             throw IllegalAccessException(Responses.USER_UPDATE_NOT_ALLOWED)
         }
     }

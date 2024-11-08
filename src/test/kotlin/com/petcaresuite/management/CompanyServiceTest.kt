@@ -1,9 +1,9 @@
 package com.petcaresuite.management
 
 import com.petcaresuite.management.application.dto.CompanyDTO
+import com.petcaresuite.management.application.exception.CompanyNotFoundException
 import com.petcaresuite.management.application.mapper.CompanyMapper
 import com.petcaresuite.management.application.port.output.CompanyPersistencePort
-import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.application.service.CompanyService
 import com.petcaresuite.management.application.service.UserService
 import com.petcaresuite.management.application.service.messages.Responses
@@ -29,9 +29,6 @@ class CompanyServiceTest {
     private lateinit var companyPersistencePort: CompanyPersistencePort
 
     @Mock
-    private lateinit var userPersistencePort: UserPersistencePort
-
-    @Mock
     private lateinit var companyMapper: CompanyMapper
 
     @Mock
@@ -52,6 +49,12 @@ class CompanyServiceTest {
             users = emptyList()
         )
 
+        mockCompanyDTO = CompanyDTO(
+            companyIdentification = "123456",
+            name = "Test Company",
+            country = "US"
+        )
+
         mockUser = User(
             id = 1L,
             email = "test@test.com",
@@ -63,59 +66,17 @@ class CompanyServiceTest {
             enabled = true,
             lastModified = LocalDateTime.now(),
             createdDate = LocalDateTime.now(),
-            company = null,
-            roles = emptySet()
-        )
-
-        mockCompanyDTO = CompanyDTO(
-            companyIdentification = "123456",
-            name = "Test Company",
-            country = "US"
+            company = mockCompany,
+            roles = emptySet(),
+            companyId = null,
         )
 
         companyService = CompanyService(
             companyDomainService,
             companyPersistencePort,
-            userPersistencePort,
             companyMapper,
             userService
         )
-    }
-
-    @Test
-    fun `save - successful company creation`() {
-        // Given
-        Mockito.`when`(userService.getCurrentUser()).thenReturn(mockUser)
-        Mockito.`when`(companyMapper.toDomain(mockCompanyDTO)).thenReturn(mockCompany)
-        Mockito.`when`(companyPersistencePort.save(any(Company::class.java))).thenReturn(mockCompany)
-        Mockito.doNothing().`when`(companyDomainService).validateUserCompanyExistence(mockUser)
-        Mockito.doNothing().`when`(companyDomainService).validateName(mockCompanyDTO.name)
-        Mockito.doNothing().`when`(companyDomainService).validateCompanyIdentification(mockCompanyDTO.companyIdentification)
-
-        // When
-        val result = companyService.save(mockCompanyDTO)
-
-        // Then
-        Mockito.verify(companyDomainService).validateUserCompanyExistence(mockUser)
-        Mockito.verify(companyDomainService).validateName(mockCompanyDTO.name)
-        Mockito.verify(companyDomainService).validateCompanyIdentification(mockCompanyDTO.companyIdentification)
-        Mockito.verify(companyPersistencePort).save(any(Company::class.java))
-        Mockito.verify(userPersistencePort).save(any(User::class.java))
-        assert(result.message == Responses.COMPANY_CREATED)
-    }
-
-    @Test
-    fun `save - throws exception when user already has company`() {
-        // Given
-        Mockito.`when`(userService.getCurrentUser()).thenReturn(mockUser)
-        Mockito.doThrow(IllegalStateException("User already has a company"))
-            .`when`(companyDomainService)
-            .validateUserCompanyExistence(mockUser)
-
-        // When/Then
-        assertThrows<IllegalStateException> {
-            companyService.save(mockCompanyDTO)
-        }
     }
 
     @Test
@@ -127,7 +88,7 @@ class CompanyServiceTest {
         Mockito.doNothing().`when`(companyDomainService).validateUserCompanyAccess(mockUser, companyId)
 
         // When
-        val result = companyService.update(mockCompanyDTO, companyId)
+        val result = companyService.update(mockCompanyDTO)
 
         // Then
         Mockito.verify(companyDomainService).validateUserCompanyAccess(mockUser, companyId)
@@ -138,15 +99,14 @@ class CompanyServiceTest {
     @Test
     fun `update - throws exception when company not found`() {
         // Given
-        val companyId = 1L
         Mockito.`when`(userService.getCurrentUser()).thenReturn(mockUser)
-        Mockito.`when`(companyPersistencePort.findById(companyId)).thenReturn(null)
+        Mockito.`when`(companyPersistencePort.findById(mockUser.company!!.id)).thenReturn(null)
 
         // When/Then
-        val exception = assertThrows<IllegalArgumentException> {
-            companyService.update(mockCompanyDTO, companyId)
+        val exception = assertThrows<CompanyNotFoundException> {
+            companyService.update(mockCompanyDTO)
         }
-        assert(exception.message == Responses.COMPANY_IDENTIFICATION_DOESNT_EXIST.format(companyId))
+        assert(exception.message == Responses.COMPANY_IDENTIFICATION_DOESNT_EXIST.format(mockUser.company!!.id))
     }
 
     @Test
@@ -160,7 +120,7 @@ class CompanyServiceTest {
         Mockito.doNothing().`when`(companyDomainService).validateName("New Name")
 
         // When
-        companyService.update(updatedCompanyDTO, companyId)
+        companyService.update(updatedCompanyDTO)
 
         // Then
         Mockito.verify(companyDomainService).validateName("New Name")
@@ -177,7 +137,7 @@ class CompanyServiceTest {
         Mockito.doNothing().`when`(companyDomainService).validateCompanyIdentification("654321")
 
         // When
-        companyService.update(updatedCompanyDTO, companyId)
+        companyService.update(updatedCompanyDTO)
 
         // Then
         Mockito.verify(companyDomainService).validateCompanyIdentification("654321")

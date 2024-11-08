@@ -1,10 +1,10 @@
 package com.petcaresuite.management.application.service
 
 import com.petcaresuite.management.application.dto.*
+import com.petcaresuite.management.application.exception.CompanyNotFoundException
 import com.petcaresuite.management.application.mapper.CompanyMapper
 import com.petcaresuite.management.application.port.input.CompanyUseCase
 import com.petcaresuite.management.application.port.output.CompanyPersistencePort
-import com.petcaresuite.management.application.port.output.UserPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.model.Company
 import com.petcaresuite.management.domain.model.User
@@ -25,7 +25,7 @@ class CompanyService(
     override fun update(companyDTO: CompanyDTO): ResponseDTO {
         val user = userService.getCurrentUser()
         val company = companyPersistencePort.findById(user.company!!.id)
-            ?: throw IllegalArgumentException(Responses.COMPANY_IDENTIFICATION_DOESNT_EXIST.format(user.company!!.id))
+            ?: throw CompanyNotFoundException(Responses.COMPANY_IDENTIFICATION_DOESNT_EXIST.format(user.company!!.id))
         validateUpdate(companyDTO, user, company, user.company!!.id)
         val updatableCompany = setUpdatableFields(companyDTO, company)
         companyPersistencePort.save(updatableCompany)
@@ -79,7 +79,7 @@ class CompanyService(
             totalAttentions = attentionsTrend.totalAttentions,
             attentionsTrend = attentionsTrend.attentionsTrend,
             inventorySales = inventorySales,
-            inventoryTrend = attentionsTrend.attentionsTrend,
+            inventoryTrend = inventoryTrend.inventoryTrend,
             todayAppointments = appointmentsTrend.totalAppointments,
             todayAppointmentsTrend = appointmentsTrend.appointmentsTrend
         )
