@@ -65,7 +65,7 @@ class EmployeeServiceTest {
     private lateinit var mockEmployeeRegisterDTO: EmployeeRegisterDTO
     private lateinit var mockFilter: EmployeeFilterDTO
 
-            @BeforeEach
+    @BeforeEach
     fun setUp() {
         mockCompany = Company(
             id = 1L,

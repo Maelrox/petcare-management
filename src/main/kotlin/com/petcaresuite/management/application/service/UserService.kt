@@ -1,6 +1,7 @@
 package com.petcaresuite.management.application.service
 
 import com.petcaresuite.management.application.dto.*
+import com.petcaresuite.management.application.exception.BadCredentialsException
 import com.petcaresuite.management.application.mapper.CompanyMapper
 import com.petcaresuite.management.application.mapper.UserMapper
 import com.petcaresuite.management.application.port.input.UserUseCase
@@ -89,7 +90,9 @@ class UserService(
     override fun getByToken(token: String): UserDetailsDTO {
         val username = jwtPort.extractUsername(token)
         val userDetails = userDetailsService.loadUserByUsername(username)
-        jwtPort.validateToken(token, userDetails)
+        if (!jwtPort.validateToken(token, userDetails)){
+            throw BadCredentialsException(Responses.INVALID_TOKEN)
+        }
         val user = getUserByUserName(username)
         return userMapper.toDTO(user)
     }

@@ -3,7 +3,6 @@ package com.petcaresuite.management.domain.service
 import com.petcaresuite.management.application.port.output.RolePersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.domain.model.*
-import com.thoughtworks.xstream.XStreamer.getDefaultPermissions
 import org.springframework.stereotype.Service
 
 @Service

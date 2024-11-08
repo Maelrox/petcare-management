@@ -1,6 +1,7 @@
 package com.petcaresuite.management.application.service.messages
 
 object Responses {
+    const val INVALID_TOKEN = "Invalid token"
     const val USER_CREATED = "The user has been created"
     const val USER_UPDATED = "The user has been updated"
     const val USER_ALREADY_EXISTS = "User %s already exists"
