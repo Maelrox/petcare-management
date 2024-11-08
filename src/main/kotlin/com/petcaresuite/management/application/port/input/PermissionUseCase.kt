@@ -23,6 +23,6 @@ interface PermissionUseCase {
 
     fun hasPermission(user: User, module: String, action: String): Boolean
 
-    fun validatePermission(user: UserDetailsDTO, module: String, action: String): ResponseDTO?
+    fun validatePermission(userDetailsDTO: UserDetailsDTO, module: String, action: String): ResponseDTO?
 
 }

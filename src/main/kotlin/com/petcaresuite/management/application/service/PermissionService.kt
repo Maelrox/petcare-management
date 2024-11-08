@@ -31,7 +31,6 @@ class PermissionService(
     private val companyMapper: CompanyMapper,
     private val userMapper: UserMapper,
     private val userService: UserService,
-    private val moduleService: ModuleService,
 ) : PermissionUseCase {
 
     @Transactional
@@ -44,7 +43,7 @@ class PermissionService(
         }.toSet()
         permissionDomainService.updatePermissionRoles(permission, rolesToUpdate, validRoles, user)
         rolePersistencePort.saveAll(validRoles)
-        var permissionsToRemoveFromRole =
+        val permissionsToRemoveFromRole =
             permissionDomainService.filterPermissionsToRemove(permission, rolesToUpdate, validRoles)
         if (permissionsToRemoveFromRole.isNotEmpty()) {
             permissionPersistencePort.deleteRemovedRoles(permission.id!!, permissionsToRemoveFromRole)
@@ -56,12 +55,12 @@ class PermissionService(
     override fun saveModules(permissionModulesDTO: PermissionModulesDTO): ResponseDTO {
         val user = userService.getCurrentUser()
         val permission = permissionPersistencePort.findById(permissionModulesDTO.id)
-        val modulesActionIds = permissionModulesDTO.modulesAction!!.mapNotNull { it.id }
+        val modulesActionIds = permissionModulesDTO.modulesAction.mapNotNull { it.id }
         val validActions = modulesActionPersistencePort.getAllByIdIn(modulesActionIds)
-        var currentActions = permission.modulesAction
+        val currentActions = permission.modulesAction
 
         val actionsToUpdate =
-            permissionModulesDTO.modulesAction!!.map { modulesActionMapper.toDomain(it) }.toMutableSet()
+            permissionModulesDTO.modulesAction.map { modulesActionMapper.toDomain(it) }.toMutableSet()
 
         val updatedActions =
             permissionDomainService.updatePermissionModules(currentActions, actionsToUpdate, validActions, user)
@@ -74,8 +73,8 @@ class PermissionService(
     override fun save(permissionDTO: PermissionDTO): ResponseDTO {
         val permissions = permissionPersistencePort.findAllByCompanyId(permissionDTO.company!!.id!!)
         permissionDomainService.validateCreation(permissionDTO, permissions)
-        var permission = permissionMapper.toDomain(permissionDTO)
-        permissionPersistencePort.save(permission)!!
+        val permission = permissionMapper.toDomain(permissionDTO)
+        permissionPersistencePort.save(permission)
         return ResponseDTO(Responses.PERMISSION_CREATED.format(permissionDTO.name))
     }
 
@@ -85,8 +84,8 @@ class PermissionService(
         permissionDomainService.validateCreation(permissionDTO, permissions)
         val companyDTO = companyMapper.toDTO(user.company!!)
         permissionDTO.company = companyDTO
-        var permission = permissionMapper.toDomain(permissionDTO)
-        permissionPersistencePort.update(permission)!!
+        val permission = permissionMapper.toDomain(permissionDTO)
+        permissionPersistencePort.update(permission)
         return ResponseDTO(Responses.PERMISSION_UPDATED.format(permissionDTO.name))
     }
 

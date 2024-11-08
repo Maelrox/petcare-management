@@ -26,7 +26,7 @@ class RoleService(
     override fun save(roleDTO: RoleDTO): ResponseDTO {
         val user = userService.getCurrentUser()
         roleDTO.company = CompanyDTO(user.company!!.id, user.company!!.name, user.company!!.country, user.company!!.companyIdentification)
-        validateCreation(roleDTO, user)
+        validate(roleDTO, user)
         val role = roleMapper.toDomain(roleDTO)
         rolePersistencePort.save(role)
         return ResponseDTO(Responses.ROLE_CREATED)
@@ -35,7 +35,7 @@ class RoleService(
     override fun update(roleDTO: RoleDTO): ResponseDTO {
         val user = userService.getCurrentUser()
         roleDTO.company = CompanyDTO(user.company!!.id, user.company!!.name, user.company!!.country, user.company!!.companyIdentification)
-        validateCreation(roleDTO, user)
+        validate(roleDTO, user)
         val role = roleMapper.toDomain(roleDTO)
         rolePersistencePort.update(role)
         return ResponseDTO(Responses.ROLE_UPDATED)
@@ -62,12 +62,7 @@ class RoleService(
         return ResponseDTO(Responses.ROLE_DELETED)
     }
 
-    private fun validateCreation(roleDTO: RoleDTO, user: User) {
-        companyDomainService.validateUserCompanyAccess(user, roleDTO.company?.id!!)
-        roleValidationService.validateNameDuplicated(roleDTO.name!!, roleDTO.company!!.id!!)
-    }
-
-    private fun validateUpdate(roleDTO: RoleDTO, user: User) {
+    private fun validate(roleDTO: RoleDTO, user: User) {
         companyDomainService.validateUserCompanyAccess(user, roleDTO.company?.id!!)
         roleValidationService.validateNameDuplicated(roleDTO.name!!, roleDTO.company!!.id!!)
     }

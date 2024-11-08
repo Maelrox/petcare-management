@@ -6,7 +6,7 @@ import java.time.Instant
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class ModulesAction(
     val id: Long?,
-    val name: String,
+    var name: String,
     val createdDate: Instant?,
     val updatedDate: Instant?,
     val moduleId: Long,
