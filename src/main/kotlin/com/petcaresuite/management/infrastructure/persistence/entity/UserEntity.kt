@@ -1,7 +1,8 @@
-package com.petcaresuite.management.infrastructure.persistence.entity
+package com.petcaresuite.management.infrastructure.persistence.entity;
 
-import jakarta.persistence.*
-import java.time.LocalDateTime
+import com.petcaresuite.management.infrastructure.security.AESUtils;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -16,13 +17,13 @@ data class UserEntity(
     val password: String,
 
     @Column(nullable = false)
-    val email: String,
+    var email: String,
 
     @Column(nullable = false)
     val name: String? = null,
 
     @Column(nullable = true)
-    val phone: String? = null,
+    var phone: String? = null,
 
     @Column(nullable = true)
     val country: String? = null,
@@ -47,8 +48,31 @@ data class UserEntity(
         inverseJoinColumns = [JoinColumn(name = "role_id")]
     )
     val roles: Set<RoleEntity> = setOf()
-)
-{
+) {
+    @Transient
+    private var initialEmail: String? = null
+    @Transient
+    private var initialPhone: String? = null
+
+    @PrePersist
+    fun initializeFields() {
+        if (email != initialEmail) {
+            email = AESUtils.encrypt(email)
+        }
+        if (phone != initialPhone) {
+            phone?.let { this.phone = AESUtils.encrypt(it) }
+        }
+        initialEmail = email
+        initialPhone = phone
+    }
+
+    // Decrypt email and phone when the entity is loaded
+    @PostLoad
+    fun decryptSensitiveFields() {
+        email = AESUtils.decrypt(email)
+        phone?.let { this.phone = AESUtils.decrypt(it) }
+    }
+
     override fun toString(): String {
         return "UserEntity(id=$id, username='$username', email='$email', name=$name, phone=$phone, country=$country, enabled=$enabled, lastModified=$lastModified, createdDate=$createdDate)"
     }

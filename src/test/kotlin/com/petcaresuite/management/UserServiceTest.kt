@@ -5,25 +5,26 @@ import com.petcaresuite.management.application.mapper.UserMapper
 import com.petcaresuite.management.application.port.output.*
 import com.petcaresuite.management.application.service.UserService
 import com.petcaresuite.management.application.service.messages.Responses
-import com.petcaresuite.management.application.service.modules.ModuleActions
 import com.petcaresuite.management.domain.model.*
 import com.petcaresuite.management.domain.service.CompanyDomainService
 import com.petcaresuite.management.domain.service.RoleDomainService
 import com.petcaresuite.management.domain.service.UserDomainService
+import com.petcaresuite.management.infrastructure.security.AESUtils.decrypt
+import com.petcaresuite.management.infrastructure.security.AESUtils.encrypt
 import com.petcaresuite.management.infrastructure.security.UserDetailsService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.*
 import kotlin.test.assertEquals
+
 
 @ExtendWith(MockitoExtension::class)
 class UserServiceTest {
@@ -302,6 +303,14 @@ class UserServiceTest {
         }
     }
 
+    @Test
+    fun shouldEncryptAndDecryptString() {
+        val originalText = "301-111-1111"
+        val encryptedText = encrypt(originalText)
+        val decryptedText = decrypt(encryptedText)
+
+        assertEquals(originalText, decryptedText)
+    }
     private fun <T> customAny(type: Class<T>): T = any<T>(type)
 
 }
