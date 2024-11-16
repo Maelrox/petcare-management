@@ -11,8 +11,6 @@ import com.petcaresuite.management.application.mapper.UserMapper
 import com.petcaresuite.management.application.service.messages.Responses
 import com.petcaresuite.management.application.security.CustomUserDetails
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaModuleActionRepository
-import com.petcaresuite.management.infrastructure.persistence.repository.JpaPermissionRepository
-import jakarta.transaction.Transactional
 
 @Service
 class AuthenticationUseCase(
@@ -23,7 +21,6 @@ class AuthenticationUseCase(
     private val jpaModuleActionRepository: JpaModuleActionRepository,
 ) : AuthenticationUseCase {
 
-    @Transactional
     override fun authenticate(request: AuthenticationRequestDTO): AuthenticationResponseDTO {
         if (loggingAttemptService.isBlocked()) {
             throw IllegalAccessException(Responses.USER_LOGIN_TOO_MANY_ATTEMPTS)
