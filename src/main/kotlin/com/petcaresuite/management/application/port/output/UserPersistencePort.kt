@@ -1,5 +1,6 @@
 package com.petcaresuite.management.application.port.output
 
+import com.petcaresuite.management.domain.model.IdentificationType
 import com.petcaresuite.management.domain.model.User
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -16,5 +17,7 @@ interface UserPersistencePort {
     fun findByUsername(username: String): User?
 
     fun findAllByFilterPaginated(filter: User, pageable: Pageable, companyId: Long): Page<User>
+
+    fun getIdentificationTypes(): List<IdentificationType>
 
 }

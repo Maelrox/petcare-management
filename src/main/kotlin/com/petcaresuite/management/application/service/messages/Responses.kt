@@ -74,4 +74,6 @@ object Responses {
     const val PERMISSION_ALREADY_EXISTS_FOR_THE_ROLE = "Permission already exist for the role"
     const val PERMISSION_MODULES_ACTION_CREATED = "Permission modules action created"
 
+    const val NO_IDENTIFICATION_TYPES = "No identification types are configured"
+
 }

@@ -13,4 +13,6 @@ interface UserUseCase {
 
     fun getByUserName(username: String): User
 
+    fun getIdentificationTypes(): List<IdentificationTypeDTO>?
+
 }

@@ -1,8 +1,12 @@
 package com.petcaresuite.management.infrastructure.persistence.adapter
 
+import com.petcaresuite.management.application.mapper.IdentificationTypeMapper
 import com.petcaresuite.management.application.port.output.UserPersistencePort
+import com.petcaresuite.management.domain.model.IdentificationType
 import com.petcaresuite.management.domain.model.User
+import com.petcaresuite.management.infrastructure.persistence.mapper.IdentificationTypeEntityMapper
 import com.petcaresuite.management.infrastructure.persistence.mapper.UserEntityMapper
+import com.petcaresuite.management.infrastructure.persistence.repository.JpaIdentificationTypeRepository
 import com.petcaresuite.management.infrastructure.persistence.repository.JpaUserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -12,7 +16,9 @@ import java.util.Optional
 @Component
 class UserRepositoryAdapter(
     private val userRepository: JpaUserRepository,
-    private val userMapper: UserEntityMapper
+    private val userMapper: UserEntityMapper,
+    private val jpaIdentificationTypeRepository: JpaIdentificationTypeRepository,
+    private val identificationTypeEntityMapper: IdentificationTypeEntityMapper,
 ) : UserPersistencePort {
     override fun getUserInfoByUsername(username: String): Optional<User> {
         val userEntity = userRepository.findByUsername(username.trim())
@@ -50,6 +56,10 @@ class UserRepositoryAdapter(
     override fun findAllByFilterPaginated(filter: User, pageable: Pageable, companyId: Long): Page<User> {
         val pagedRolesEntity = userRepository.findAllByFilter(filter, pageable, companyId)
         return pagedRolesEntity.map { userMapper.toDomain(it) }
+    }
+
+    override fun getIdentificationTypes(): List<IdentificationType> {
+        return identificationTypeEntityMapper.toDomain(jpaIdentificationTypeRepository.findAll())
     }
 
 }

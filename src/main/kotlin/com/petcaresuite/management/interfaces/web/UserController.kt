@@ -34,4 +34,10 @@ class UserController(private val userUseCase: UserUseCase) {
         return ResponseEntity.ok(userUseCase.getByToken(token))
     }
 
+    @GetMapping("/identificationTypes")
+    @Authorize
+    fun getIdentificationTypes(): ResponseEntity<List<IdentificationTypeDTO>> {
+        return ResponseEntity.ok(userUseCase.getIdentificationTypes())
+    }
+
 }

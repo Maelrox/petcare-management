@@ -3,6 +3,7 @@ package com.petcaresuite.management.application.service
 import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.application.exception.BadCredentialsException
 import com.petcaresuite.management.application.mapper.CompanyMapper
+import com.petcaresuite.management.application.mapper.IdentificationTypeMapper
 import com.petcaresuite.management.application.mapper.UserMapper
 import com.petcaresuite.management.application.port.input.UserUseCase
 import com.petcaresuite.management.application.port.output.*
@@ -36,6 +37,7 @@ class UserService(
     private val permissionPersistencePort: PermissionPersistencePort,
     private val roleDomainService: RoleDomainService,
     private val companyMapper: CompanyMapper,
+    private val identificationTypeMapper: IdentificationTypeMapper,
 ) :
     UserUseCase {
 
@@ -85,6 +87,11 @@ class UserService(
     override fun getByUserName(username: String): User {
         return userPersistencePort.getUserInfoByUsername(username)
             .orElseThrow { IllegalArgumentException(Responses.USER_NOT_VALID) }
+    }
+
+    override fun getIdentificationTypes(): List<IdentificationTypeDTO>? {
+        val identificationTypes = userPersistencePort.getIdentificationTypes()
+        return identificationTypeMapper.toDTO(identificationTypes)
     }
 
     override fun getByToken(token: String): UserDetailsDTO {
