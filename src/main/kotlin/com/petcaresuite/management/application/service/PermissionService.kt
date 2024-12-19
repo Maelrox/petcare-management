@@ -62,8 +62,7 @@ class PermissionService(
         val actionsToUpdate =
             permissionModulesDTO.modulesAction.map { modulesActionMapper.toDomain(it) }.toMutableSet()
 
-        val updatedActions =
-            permissionDomainService.updatePermissionModules(currentActions, actionsToUpdate, validActions, user)
+        val updatedActions = permissionDomainService.updatePermissionModules(currentActions, actionsToUpdate, validActions, user)
         permission.modulesAction!!.addAll(updatedActions)
         permissionPersistencePort.save(permission)
         permissionPersistencePort.deleteRemovedModules(permission.id!!, modulesActionIds, permissionModulesDTO.moduleId)

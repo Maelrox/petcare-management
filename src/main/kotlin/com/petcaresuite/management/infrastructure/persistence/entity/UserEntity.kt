@@ -1,8 +1,9 @@
-package com.petcaresuite.management.infrastructure.persistence.entity;
+package com.petcaresuite.management.infrastructure.persistence.entity
 
-import com.petcaresuite.management.infrastructure.security.AESUtils;
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import com.petcaresuite.management.infrastructure.security.AESUtils
+import jakarta.persistence.*
+import java.time.LocalDateTime
+import java.util.Base64
 
 @Entity
 @Table(name = "users")
@@ -49,28 +50,48 @@ data class UserEntity(
     )
     val roles: Set<RoleEntity> = setOf()
 ) {
-    @Transient
-    private var initialEmail: String? = null
-    @Transient
-    private var initialPhone: String? = null
+    companion object {
+        private fun isBase64(str: String): Boolean {
+            return try {
+                Base64.getDecoder().decode(str)
+                true
+            } catch (e: IllegalArgumentException) {
+                false
+            }
+        }
 
-    @PrePersist
-    fun initializeFields() {
-        if (email != initialEmail) {
-            email = AESUtils.encrypt(email)
+        private fun decryptIfEncrypted(value: String): String {
+            return if (isBase64(value)) {
+                try {
+                    AESUtils.decrypt(value)
+                } catch (e: Exception) {
+                    value // Return original value if decryption fails
+                }
+            } else {
+                value
+            }
         }
-        if (phone != initialPhone) {
-            phone?.let { this.phone = AESUtils.encrypt(it) }
-        }
-        initialEmail = email
-        initialPhone = phone
     }
 
-    // Decrypt email and phone when the entity is loaded
+    @PrePersist
+    @PreUpdate
+    fun encryptFields() {
+        // Only encrypt if the field is not already encrypted
+        if (!isBase64(email)) {
+            email = AESUtils.encrypt(email)
+        }
+
+        phone?.let {
+            if (!isBase64(it)) {
+                phone = AESUtils.encrypt(it)
+            }
+        }
+    }
+
     @PostLoad
-    fun decryptSensitiveFields() {
-        email = AESUtils.decrypt(email)
-        phone?.let { this.phone = AESUtils.decrypt(it) }
+    fun decryptFields() {
+        email = decryptIfEncrypted(email)
+        phone = phone?.let { decryptIfEncrypted(it) }
     }
 
     override fun toString(): String {
