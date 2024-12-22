@@ -24,7 +24,7 @@ class JwtService : JwtPort {
     }
 
     private fun createToken(claims: Map<String, Any>, username: String): Pair<String, Date> {
-        val expirationDate = Date(System.currentTimeMillis() + 1000 * 60 * 30)
+        val expirationDate = Date(System.currentTimeMillis() + 1000 * 60 * 180)
         val token = Jwts.builder()
             .claims(claims)
             .subject(username)
@@ -73,10 +73,27 @@ class JwtService : JwtPort {
     override fun validateToken(token: String, userDetails: UserDetails): Boolean {
         try {
             val username = extractUsername(token)
-            return username == userDetails.username && !isTokenExpired(token)
+            if (username == userDetails.username && !isTokenExpired(token)) {
+                refreshTokenIfNeeded(token)
+                return true
+            }
+            return false
         } catch (ex: TokenExpiredException) {
             throw ex
         }
+    }
+
+    // Refresh if less than 5 minutes (300,000 ms) remain
+    private fun refreshTokenIfNeeded(token: String): String? {
+        val expirationTime = extractExpiration(token).time
+        val currentTime = System.currentTimeMillis()
+
+        if (expirationTime - currentTime <= 300_000) {
+            val username = extractUsername(token)
+            val refreshedToken = generateToken(username)
+            return refreshedToken.first
+        }
+        return null
     }
 
 }

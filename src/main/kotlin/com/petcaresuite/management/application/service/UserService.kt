@@ -97,6 +97,7 @@ class UserService(
     override fun getByToken(token: String): UserDetailsDTO {
         val username = jwtPort.extractUsername(token)
         val userDetails = userDetailsService.loadUserByUsername(username)
+        //TODO return tuple and get refresh token
         if (!jwtPort.validateToken(token, userDetails)){
             throw BadCredentialsException(Responses.INVALID_TOKEN)
         }
