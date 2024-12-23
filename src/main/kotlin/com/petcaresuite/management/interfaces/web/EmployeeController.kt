@@ -20,7 +20,7 @@ class EmployeeController(private val employeeUseCase: EmployeeUseCase) {
 
     @PutMapping
     @Authorize
-    fun update(@Valid @RequestBody dto: EmployeeRegisterDTO): ResponseEntity<ResponseDTO> {
+    fun update(@Valid @RequestBody dto: EmployeeUpdateDTO): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(employeeUseCase.update(dto))
     }
 
@@ -28,6 +28,18 @@ class EmployeeController(private val employeeUseCase: EmployeeUseCase) {
     @Authorize
     fun registerEmployee(@Valid @RequestBody dto: EmployeeRegisterDTO): ResponseEntity<ResponseDTO> {
         return ResponseEntity.ok(employeeUseCase.register(dto))
+    }
+
+    @PatchMapping("/{username}/enable")
+    @Authorize
+    fun enableUser(@PathVariable username: String): ResponseEntity<ResponseDTO> {
+        return ResponseEntity.ok(employeeUseCase.activateDeactiveUser(username, true))
+    }
+
+    @PatchMapping("/{username}/disable")
+    @Authorize
+    fun disableUser(@PathVariable username: String): ResponseEntity<ResponseDTO> {
+        return ResponseEntity.ok(employeeUseCase.activateDeactiveUser(username, false))
     }
 
     @GetMapping()

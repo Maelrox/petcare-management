@@ -9,10 +9,12 @@ interface EmployeeUseCase {
     
     fun register(employeeRegisterDTO: EmployeeRegisterDTO): ResponseDTO
 
-    fun update(employeeRegisterDTO: EmployeeRegisterDTO): ResponseDTO
+    fun update(employeeUpdateDTO: EmployeeUpdateDTO): ResponseDTO
 
     fun getByUserName(username: String): User
 
     fun getAllByFilter(filterDTO: EmployeeFilterDTO, pageable: Pageable): Page<UserDetailsDTO>
+
+    fun activateDeactiveUser(username: String, isEnabled: Boolean): ResponseDTO?
 
 }

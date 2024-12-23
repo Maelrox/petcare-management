@@ -45,11 +45,13 @@ class EmployeeService(
         )
     }
 
-    override fun update(employeeRegisterDTO: EmployeeRegisterDTO): ResponseDTO {
-        validateEmployeeUpdate(employeeRegisterDTO)
-        val user = userPersistencePort.getById(employeeRegisterDTO.id!!)
-        employeeRegisterDTO.password = passwordEncoder.encode(employeeRegisterDTO.password!!)
-        setUpdatableFields(employeeRegisterDTO, user)
+    override fun update(employeeUpdateDTO: EmployeeUpdateDTO): ResponseDTO {
+        validateEmployeeUpdate(employeeUpdateDTO)
+        val user = userPersistencePort.getById(employeeUpdateDTO.id!!)
+        if (employeeUpdateDTO.password != null) {
+            employeeUpdateDTO.password = passwordEncoder.encode(employeeUpdateDTO.password!!)
+        }
+        setUpdatableFields(employeeUpdateDTO, user)
         userPersistencePort.save(user)
         return ResponseDTO.generateSuccessResponse(true, Responses.USER_UPDATED)
     }
@@ -66,6 +68,15 @@ class EmployeeService(
         return userPersistencePort.findAllByFilterPaginated(filter, pageable, user.company!!.id).map { employeeMapper.toDTO(it) }
     }
 
+    override fun activateDeactiveUser(username: String, isEnabled: Boolean): ResponseDTO? {
+        val currentUser = getCurrentUser()
+        val userToUpdate = userPersistencePort.findByUsername(username)
+        employeeDomainService.validateActivationDeactivationPermission(currentUser, userToUpdate!!)
+        userToUpdate.enabled = isEnabled
+        userPersistencePort.save(userToUpdate)
+        return ResponseDTO.generateSuccessResponse(true, Responses.USER_UPDATED)
+    }
+
     private fun validateEmployeeRegistration(employeeRegisterDTO: EmployeeRegisterDTO) {
         if (employeeRegisterDTO.roles.isEmpty()) {
             throw IllegalArgumentException(Responses.REGISTER_NO_ROLE)
@@ -74,10 +85,12 @@ class EmployeeService(
         employeeDomainService.validateUserDoesNotExist(employeeRegisterDTO.username!!)
     }
 
-    private fun validateEmployeeUpdate(employeeUpdateDTO: EmployeeRegisterDTO) {
+    private fun validateEmployeeUpdate(employeeUpdateDTO: EmployeeUpdateDTO) {
         employeeDomainService.validateUpdatePermission(employeeUpdateDTO)
-        employeeDomainService.validateRoles(setOf(employeeUpdateDTO.roles))
-        employeeDomainService.validatePasswordComplexity(employeeUpdateDTO.password!!)
+        employeeDomainService.validateUpdateRoles(employeeUpdateDTO.roles)
+        if (employeeUpdateDTO.password != null) {
+            employeeDomainService.validatePasswordComplexity(employeeUpdateDTO.password!!)
+        }
     }
 
     private fun retrieveRoles(roles: Set<String>): Set<Role> {
@@ -86,12 +99,21 @@ class EmployeeService(
         }.toSet()
     }
 
-    private fun setUpdatableFields(employeeRegisterDTO: EmployeeRegisterDTO, user: User) {
-        user.password = employeeRegisterDTO.password
-        val roles = retrieveRoles(setOf(employeeRegisterDTO.roles))
+    private fun retrieveUpdateRoles(roles: Set<RoleDTO>): Set<Role> {
+        return roles.mapNotNull { role ->
+            rolePersistencePort.findByName(role.name!!)
+        }.toSet()
+    }
+
+
+    private fun setUpdatableFields(employeeUpdateDTO: EmployeeUpdateDTO, user: User) {
+        if (employeeUpdateDTO.password != null) {
+            user.password = employeeUpdateDTO.password
+        }
+        val roles = retrieveUpdateRoles(employeeUpdateDTO.roles)
         user.roles = roles
-        user.country = employeeRegisterDTO.country
-        user.enabled = employeeRegisterDTO.enabled!!
+        user.country = employeeUpdateDTO.country
+        user.enabled = employeeUpdateDTO.enabled!!
         user.lastModified = LocalDateTime.now()
     }
 

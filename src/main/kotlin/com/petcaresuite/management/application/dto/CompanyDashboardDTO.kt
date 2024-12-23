@@ -9,5 +9,8 @@ data class CompanyDashboardDTO(
     val inventoryTrend: TrendDTO,
     val todayAppointments: Int,
     val todayAppointmentsTrend: TrendDTO,
-    val chartData: List<ChartDataDTO>
+    val chartData: List<ChartDataDTO>,
+    //val hotMetric: HotmetricDTO,
+    //val companyData: CompanyDTO,
+    //val employeeData: EmployeeResumeDTO
 )

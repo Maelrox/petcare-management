@@ -81,7 +81,7 @@ class CompanyService(
             inventorySales = inventorySales,
             inventoryTrend = inventoryTrend.inventoryTrend,
             todayAppointments = appointmentsTrend.totalAppointments,
-            todayAppointmentsTrend = appointmentsTrend.appointmentsTrend
+            todayAppointmentsTrend = appointmentsTrend.appointmentsTrend,
         )
     }
 
