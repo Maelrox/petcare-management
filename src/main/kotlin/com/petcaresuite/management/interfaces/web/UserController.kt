@@ -35,7 +35,7 @@ class UserController(private val userUseCase: UserUseCase) {
     }
 
     @GetMapping("/identificationTypes")
-    @Authorize
+    @PermissionRequired(Modules.OWNER, ModuleActions.VIEW)
     fun getIdentificationTypes(): ResponseEntity<List<IdentificationTypeDTO>> {
         return ResponseEntity.ok(userUseCase.getIdentificationTypes())
     }
