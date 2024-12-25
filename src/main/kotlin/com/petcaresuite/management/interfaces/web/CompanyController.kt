@@ -28,7 +28,7 @@ class CompanyController(private val companyUseCase: CompanyUseCase) {
     @GetMapping("/dashboard")
     @Authorize
     fun getCompanyDashboard(): ResponseEntity<CompanyDashboardDTO> {
-        return ResponseEntity.ok(companyUseCase.getDashBoard())
+        return ResponseEntity.ok(companyUseCase.getDashboard())
     }
 
 }

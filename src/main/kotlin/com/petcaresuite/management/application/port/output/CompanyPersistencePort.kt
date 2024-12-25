@@ -33,4 +33,7 @@ interface CompanyPersistencePort {
 
     fun getInventoryTrend(companyId: Long): InventoryTrendDTO
 
+    fun getHotmetrics(companyId: Long): HotmetricDTO
+
+
 }

@@ -260,4 +260,90 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
             .setScale(2, RoundingMode.HALF_UP)
             .toDouble()
     }
+
+    fun getHotMetrics(companyId: Long): HotmetricDTO {
+        val peakHoursData = jdbcTemplate.query("""
+        WITH hourly_counts AS (
+            SELECT 
+                EXTRACT(HOUR FROM consultation_date) as hour,
+                COUNT(*) as consultation_count
+            FROM consultations
+            WHERE company_id = ?
+            AND DATE_TRUNC('month', consultation_date) = DATE_TRUNC('month', CURRENT_DATE)
+            AND status IN ('ATTENDED', 'PAID')
+            GROUP BY EXTRACT(HOUR FROM consultation_date)
+        ),
+        max_count AS (
+            SELECT MAX(consultation_count) as max_count
+            FROM hourly_counts
+        )
+        SELECT 
+            hour,
+            consultation_count,
+            ROUND((consultation_count * 100.0 / NULLIF(max_count, 0))::numeric, 2) as percentage
+        FROM hourly_counts, max_count
+        WHERE consultation_count = max_count
+        ORDER BY hour ASC
+        LIMIT 1
+    """, { rs, _ ->
+            Triple(
+                rs.getInt("hour"),
+                rs.getInt("consultation_count"),
+                rs.getDouble("percentage")
+            )
+        }, companyId).firstOrNull() ?: Triple(0, 0, 0.0)
+
+        // Calculate high traffic percentage for the peak hour
+        val highTrafficPercentage = jdbcTemplate.queryForObject("""
+        WITH peak_hour_consultations AS (
+            SELECT COUNT(*) as peak_count
+            FROM consultations
+            WHERE company_id = ?
+            AND DATE_TRUNC('month', consultation_date) = DATE_TRUNC('month', CURRENT_DATE)
+            AND EXTRACT(HOUR FROM consultation_date) = ?
+            AND status IN ('ATTENDED', 'PAID')
+        ),
+        total_consultations AS (
+            SELECT COUNT(*) as total_count
+            FROM consultations
+            WHERE company_id = ?
+            AND DATE_TRUNC('month', consultation_date) = DATE_TRUNC('month', CURRENT_DATE)
+            AND status IN ('ATTENDED', 'PAID')
+        )
+        SELECT 
+            CASE 
+                WHEN COALESCE(total_count, 0) = 0 THEN 0
+                ELSE ROUND((COALESCE(peak_count, 0) * 100.0 / total_count)::numeric, 2)
+            END as traffic_percentage
+        FROM peak_hour_consultations, total_consultations
+    """, Double::class.java, companyId, peakHoursData.first, companyId)
+
+        // Get total consultations from last day including paid ones
+        val lastDayConsultations = jdbcTemplate.queryForObject("""
+        SELECT COUNT(*) as total_consultations
+        FROM consultations
+        WHERE company_id = ?
+        AND DATE_TRUNC('day', consultation_date) = DATE_TRUNC('day', CURRENT_DATE - INTERVAL '1 day')
+        AND status IN ('ATTENDED', 'PAID')
+    """, Int::class.java, companyId)
+
+        // Format peak hour in 12-hour format with AM/PM
+        val peakHourFormatted = if (peakHoursData.second == 0) {
+            null  // No consultations found
+        } else {
+            when {
+                peakHoursData.first == 0 -> "12 AM"
+                peakHoursData.first < 12 -> "${peakHoursData.first} AM"
+                peakHoursData.first == 12 -> "12 PM"
+                else -> "${peakHoursData.first - 12} PM"
+            }
+        }
+
+        return HotmetricDTO(
+            peakHours = peakHourFormatted,
+            highTraffic = highTrafficPercentage.toInt(),
+            consultations = lastDayConsultations
+        )
+    }
+
 }

@@ -113,5 +113,8 @@ class CompanyDomainService(
         return companyPersistencePort.getInventoryTrend(companyId)
     }
 
+    fun getHotmetrics(companyId: Long): HotmetricDTO {
+        return companyPersistencePort.getHotmetrics(companyId)
+    }
 
 }

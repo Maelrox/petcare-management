@@ -75,4 +75,8 @@ class CompanyRepositoryAdapter(
         return dashboardRepository.getInventoryTrends(companyId)
     }
 
+    override fun getHotmetrics(companyId: Long): HotmetricDTO {
+        return dashboardRepository.getHotMetrics(companyId)
+    }
+
 }

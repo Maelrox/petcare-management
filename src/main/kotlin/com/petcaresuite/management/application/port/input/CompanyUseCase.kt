@@ -8,5 +8,5 @@ interface CompanyUseCase {
 
     fun get(): CompanyDTO
 
-    fun getDashBoard(): CompanyDashboardDTO?
+    fun getDashboard(): CompanyDashboardDTO?
 }

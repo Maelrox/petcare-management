@@ -37,7 +37,7 @@ class CompanyService(
         return companyMapper.toDTO(user.company!!)
     }
 
-    override fun getDashBoard(): CompanyDashboardDTO? {
+    override fun getDashboard(): CompanyDashboardDTO? {
         val user = userService.getCurrentUser()
         val company = companyPersistencePort.findById(user.company!!.id)
         return getCompanyResume(company!!.id)
@@ -72,6 +72,8 @@ class CompanyService(
         val appointmentsTrend = companyDomainService.getAppointmentsToday(companyId)
         val patientChartData = companyDomainService.getPatientChartData(companyId)
 
+        val hotMetrics = companyDomainService.getHotmetrics(companyId)
+
         return CompanyDashboardDTO(
             totalCustomers = ownerTrends.totalOwners,
             customersTrend = ownerTrends.customersTrend,
@@ -82,8 +84,8 @@ class CompanyService(
             inventoryTrend = inventoryTrend.inventoryTrend,
             todayAppointments = appointmentsTrend.totalAppointments,
             todayAppointmentsTrend = appointmentsTrend.appointmentsTrend,
+            hotMetric = hotMetrics
         )
     }
-
 
 }
