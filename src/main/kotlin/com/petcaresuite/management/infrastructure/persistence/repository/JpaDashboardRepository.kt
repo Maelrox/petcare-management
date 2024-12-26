@@ -369,4 +369,19 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
         return EmployeeResumeDTO(mapTotals)
     }
 
+    fun getServiceResume(companyId: Long): ServiceResumeDTO {
+        val sql = """
+        SELECT 
+            name
+        FROM services
+        WHERE company_id = ?
+    """
+        val serviceNames: Set<String> = jdbcTemplate.query(sql, { rs, _ ->
+            rs.getString("name")
+        }, companyId).toSet()
+        return ServiceResumeDTO(
+            mapTotals = serviceNames
+        )
+    }
+
 }

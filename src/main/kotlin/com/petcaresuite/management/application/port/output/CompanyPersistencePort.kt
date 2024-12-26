@@ -37,4 +37,6 @@ interface CompanyPersistencePort {
 
     fun getEmployeeResume(companyId: Long): EmployeeResumeDTO
 
+    fun getServiceResume(companyId: Long): ServiceResumeDTO
+
 }

@@ -83,4 +83,8 @@ class CompanyRepositoryAdapter(
         return dashboardRepository.getEmployeeResume(companyId)
     }
 
+    override fun getServiceResume(companyId: Long): ServiceResumeDTO {
+        return dashboardRepository.getServiceResume(companyId)
+    }
+
 }

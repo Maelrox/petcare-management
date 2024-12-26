@@ -121,4 +121,8 @@ class CompanyDomainService(
         return companyPersistencePort.getEmployeeResume(companyId)
     }
 
+    fun getServiceResume(companyId: Long): ServiceResumeDTO {
+        return companyPersistencePort.getServiceResume(companyId)
+    }
+
 }

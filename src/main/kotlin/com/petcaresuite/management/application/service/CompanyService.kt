@@ -98,6 +98,7 @@ class CompanyService(
         val company = companyPersistencePort.findById(companyId)
         val companyDTO = companyMapper.toDTO(company!!)
         val employeeResume = companyDomainService.getEmployeeResume(companyId)
+        val serviceResume = companyDomainService.getServiceResume(companyId)
 
         return CompanyDashboardDTO(
             totalCustomers = ownerTrends.totalOwners,
@@ -111,7 +112,8 @@ class CompanyService(
             todayAppointmentsTrend = appointmentsTrend.appointmentsTrend,
             hotMetric = hotMetrics,
             company = companyDTO,
-            employeeResume = employeeResume
+            employeeResume = employeeResume,
+            serviceResume = serviceResume
         )
     }
 
