@@ -14,6 +14,8 @@ data class CompanyDTO(
     @field:NotNull(message = Responses.COMPANY_IDENTIFICATION_REQUIRED)
     @field:Size(min = 3, max = 255, message = Responses.COMPANY_IDENTIFICATION_LENGTH_INVALID)
     val companyIdentification: String,
-) {
-
-}
+    val phone: String?,
+    val address: String?,
+    val email: String?,
+    val logoUrl: String?,
+)

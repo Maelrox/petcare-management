@@ -79,4 +79,8 @@ class CompanyRepositoryAdapter(
         return dashboardRepository.getHotMetrics(companyId)
     }
 
+    override fun getEmployeeResume(companyId: Long): EmployeeResumeDTO {
+        return dashboardRepository.getEmployeeResume(companyId)
+    }
+
 }

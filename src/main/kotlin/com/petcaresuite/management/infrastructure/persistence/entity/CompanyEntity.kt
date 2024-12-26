@@ -18,5 +18,18 @@ data class CompanyEntity(
     val companyIdentification: String,
 
     @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val users: List<UserEntity>? = emptyList()
-)
+    val users: List<UserEntity>? = emptyList(),
+
+    @Column(name="phone")
+    val phone: String? = null,
+
+    @Column(name="address")
+    val address: String? = null,
+
+    @Column(name="email")
+    val email: String? = null,
+
+    @Column(name="logo_url")
+    var logoUrl: String? = null,
+
+    )

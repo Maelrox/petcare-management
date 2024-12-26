@@ -5,5 +5,9 @@ data class Company(
     val name: String,
     val country: String?,
     val companyIdentification: String,
-    val users: List<User>?
+    val users: List<User>?,
+    val address: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
+    var logoUrl: String? = null,
 )

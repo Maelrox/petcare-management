@@ -117,4 +117,8 @@ class CompanyDomainService(
         return companyPersistencePort.getHotmetrics(companyId)
     }
 
+    fun getEmployeeResume(companyId: Long): EmployeeResumeDTO {
+        return companyPersistencePort.getEmployeeResume(companyId)
+    }
+
 }

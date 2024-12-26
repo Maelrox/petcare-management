@@ -346,4 +346,27 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
         )
     }
 
+    fun getEmployeeResume(companyId: Long): EmployeeResumeDTO {
+        val roleCounts = jdbcTemplate.query("""
+        SELECT r.name, COUNT(DISTINCT ur.user_id) as user_count
+        FROM roles r
+        LEFT JOIN user_roles ur ON r.id = ur.role_id
+        LEFT JOIN users u ON ur.user_id = u.id
+        WHERE r.company_id = ?
+        GROUP BY r.name
+    """, { rs, _ ->
+            Pair(
+                rs.getString("name"),
+                rs.getInt("user_count")
+            )
+        }, companyId)
+
+        val mapTotals = HashMap<String, Int>()
+        roleCounts.forEach { (roleName, count) ->
+            mapTotals[roleName] = count
+        }
+
+        return EmployeeResumeDTO(mapTotals)
+    }
+
 }

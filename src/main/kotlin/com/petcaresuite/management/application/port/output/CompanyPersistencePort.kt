@@ -35,5 +35,6 @@ interface CompanyPersistencePort {
 
     fun getHotmetrics(companyId: Long): HotmetricDTO
 
+    fun getEmployeeResume(companyId: Long): EmployeeResumeDTO
 
 }

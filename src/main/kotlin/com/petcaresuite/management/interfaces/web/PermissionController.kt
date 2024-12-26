@@ -26,7 +26,11 @@ class PermissionController(private val permissionUseCase: PermissionUseCase) {
             id = userDTO.companyId,
             name = "",
             country = "",
-            companyIdentification = ""
+            companyIdentification = "",
+            phone = "",
+            address = "",
+            email = "",
+            logoUrl = ""
         )
         dto.company = companyUserDTO
         return ResponseEntity.ok(permissionUseCase.save(dto))

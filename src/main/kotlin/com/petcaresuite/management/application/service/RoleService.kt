@@ -25,7 +25,16 @@ class RoleService(
     RoleUseCase {
     override fun save(roleDTO: RoleDTO): ResponseDTO {
         val user = userService.getCurrentUser()
-        roleDTO.company = CompanyDTO(user.company!!.id, user.company!!.name, user.company!!.country, user.company!!.companyIdentification)
+        roleDTO.company = CompanyDTO(
+            user.company!!.id,
+            user.company!!.name,
+            user.company!!.country,
+            user.company!!.companyIdentification,
+            phone = user.company!!.phone,
+            address = user.company!!.address,
+            email = user.company!!.email,
+            logoUrl = user.company!!.logoUrl,
+        )
         validate(roleDTO, user)
         val role = roleMapper.toDomain(roleDTO)
         rolePersistencePort.save(role)
@@ -34,7 +43,16 @@ class RoleService(
 
     override fun update(roleDTO: RoleDTO): ResponseDTO {
         val user = userService.getCurrentUser()
-        roleDTO.company = CompanyDTO(user.company!!.id, user.company!!.name, user.company!!.country, user.company!!.companyIdentification)
+        roleDTO.company = CompanyDTO(
+            user.company!!.id,
+            user.company!!.name,
+            user.company!!.country,
+            user.company!!.companyIdentification,
+            phone = user.company!!.phone,
+            address = user.company!!.address,
+            email = user.company!!.email,
+            logoUrl = user.company!!.logoUrl,
+        )
         validate(roleDTO, user)
         val role = roleMapper.toDomain(roleDTO)
         rolePersistencePort.update(role)
@@ -50,7 +68,8 @@ class RoleService(
     override fun getAllByFilterPaginated(filterDTO: RoleFilterDTO, pageable: Pageable): Page<RoleDTO> {
         val user = userService.getCurrentUser()
         var filter = roleMapper.toDomain(filterDTO)
-        return rolePersistencePort.findAllByFilterPaginated(filter, pageable, user.company!!.id).map { roleMapper.toDTO(it) }
+        return rolePersistencePort.findAllByFilterPaginated(filter, pageable, user.company!!.id)
+            .map { roleMapper.toDTO(it) }
     }
 
     @Transactional
