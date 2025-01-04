@@ -99,6 +99,8 @@ class CompanyService(
         val companyDTO = companyMapper.toDTO(company!!)
         val employeeResume = companyDomainService.getEmployeeResume(companyId)
         val serviceResume = companyDomainService.getServiceResume(companyId)
+        val attentionResume = companyDomainService.getAttentionResume(companyId)
+        val productResume = companyDomainService.getProductResume(companyId)
 
         return CompanyDashboardDTO(
             totalCustomers = ownerTrends.totalOwners,
@@ -113,7 +115,9 @@ class CompanyService(
             hotMetric = hotMetrics,
             company = companyDTO,
             employeeResume = employeeResume,
-            serviceResume = serviceResume
+            serviceResume = serviceResume,
+            attentionResume = attentionResume,
+            productResume = productResume
         )
     }
 

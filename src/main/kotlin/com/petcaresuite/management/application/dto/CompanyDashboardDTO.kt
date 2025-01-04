@@ -13,7 +13,7 @@ data class CompanyDashboardDTO(
     val hotMetric: HotmetricDTO,
     val company: CompanyDTO,
     val employeeResume: EmployeeResumeDTO,
-    val serviceResume: ServiceResumeDTO
-    //val companyData: CompanyDTO,
-    //val employeeData: EmployeeResumeDTO
+    val serviceResume: ServiceResumeDTO,
+    val attentionResume: List<AttentionResumeDTO>,
+    val productResume: List<ProductResumeDTO>
 )

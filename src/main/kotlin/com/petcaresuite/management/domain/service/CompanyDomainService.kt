@@ -3,6 +3,7 @@ package com.petcaresuite.management.domain.service
 import com.petcaresuite.management.application.dto.*
 import com.petcaresuite.management.application.port.output.CompanyPersistencePort
 import com.petcaresuite.management.application.service.messages.Responses
+import com.petcaresuite.management.domain.model.Product
 import com.petcaresuite.management.domain.model.User
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -123,6 +124,14 @@ class CompanyDomainService(
 
     fun getServiceResume(companyId: Long): ServiceResumeDTO {
         return companyPersistencePort.getServiceResume(companyId)
+    }
+
+    fun getAttentionResume(companyId: Long): List<AttentionResumeDTO> {
+        return companyPersistencePort.getAttentionResume(companyId)
+    }
+
+    fun getProductResume(companyId: Long): List<ProductResumeDTO> {
+        return companyPersistencePort.getProductResume(companyId)
     }
 
 }

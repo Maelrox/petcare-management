@@ -4,30 +4,36 @@ import com.petcaresuite.management.application.dto.*
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import java.math.RoundingMode
+import java.util.Date
 
 @Repository
 class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
 
     fun getCurrentMonthOwners(companyId: Long): Int {
-        return jdbcTemplate.queryForObject("""
+        return jdbcTemplate.queryForObject(
+            """
             SELECT COUNT(*) as total_owners
             FROM owners 
             WHERE company_id = ?
             AND DATE_TRUNC('month', created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE)
-        """, Int::class.java, companyId) ?: 0
+        """, Int::class.java, companyId
+        ) ?: 0
     }
 
     fun getPreviousMonthOwners(companyId: Long): Int {
-        return jdbcTemplate.queryForObject("""
+        return jdbcTemplate.queryForObject(
+            """
             SELECT COUNT(*) as total_owners
             FROM owners 
             WHERE company_id = ?
             AND DATE_TRUNC('month', created_at::timestamp) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
-        """, Int::class.java, companyId) ?: 0
+        """, Int::class.java, companyId
+        ) ?: 0
     }
 
     fun getMonthlyOwners(companyId: Long): List<MonthlyOwnerCount> {
-        return jdbcTemplate.query("""
+        return jdbcTemplate.query(
+            """
             SELECT 
                 DATE_TRUNC('month', created_at::timestamp)::DATE as month_date,
                 COUNT(*) as total_owners
@@ -37,15 +43,17 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
             GROUP BY DATE_TRUNC('month', created_at::timestamp)
             ORDER BY month_date DESC
         """, { rs, _ ->
-            MonthlyOwnerCount(
-                monthDate = rs.getDate("month_date").toLocalDate(),
-                totalOwners = rs.getInt("total_owners")
-            )
-        }, companyId)
+                MonthlyOwnerCount(
+                    monthDate = rs.getDate("month_date").toLocalDate(),
+                    totalOwners = rs.getInt("total_owners")
+                )
+            }, companyId
+        )
     }
 
     fun getMonthlyConsultations(companyId: Long): List<MonthlyConsultationCount> {
-        return jdbcTemplate.query("""
+        return jdbcTemplate.query(
+            """
             SELECT 
                 DATE_TRUNC('month', consultation_date)::DATE as month_date,
                 COUNT(*) as total_consultations
@@ -55,11 +63,12 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
             GROUP BY DATE_TRUNC('month', consultation_date)
             ORDER BY month_date DESC
         """, { rs, _ ->
-            MonthlyConsultationCount(
-                monthDate = rs.getDate("month_date").toLocalDate(),
-                totalConsultations = rs.getInt("total_consultations")
-            )
-        }, companyId)
+                MonthlyConsultationCount(
+                    monthDate = rs.getDate("month_date").toLocalDate(),
+                    totalConsultations = rs.getInt("total_consultations")
+                )
+            }, companyId
+        )
     }
 
     fun getAllConsultationTrends(companyId: Long): ConsultationTrendDTO {
@@ -155,7 +164,8 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun getMonthlyPatients(companyId: Long): List<MonthlyPatientCount> {
-        return jdbcTemplate.query("""
+        return jdbcTemplate.query(
+            """
             SELECT 
                 DATE_TRUNC('month', p.created_at::timestamp)::DATE as month_date,
                 COUNT(*) as total_patients
@@ -166,11 +176,12 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
             GROUP BY DATE_TRUNC('month', p.created_at::timestamp)
             ORDER BY month_date DESC
         """, { rs, _ ->
-            MonthlyPatientCount(
-                monthDate = rs.getDate("month_date").toLocalDate(),
-                totalPatients = rs.getInt("total_patients")
-            )
-        }, companyId)
+                MonthlyPatientCount(
+                    monthDate = rs.getDate("month_date").toLocalDate(),
+                    totalPatients = rs.getInt("total_patients")
+                )
+            }, companyId
+        )
     }
 
     fun getPatientTrends(companyId: Long): PatientTrendDTO {
@@ -262,7 +273,8 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun getHotMetrics(companyId: Long): HotmetricDTO {
-        val peakHoursData = jdbcTemplate.query("""
+        val peakHoursData = jdbcTemplate.query(
+            """
         WITH hourly_counts AS (
             SELECT 
                 EXTRACT(HOUR FROM consultation_date) as hour,
@@ -286,15 +298,17 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
         ORDER BY hour ASC
         LIMIT 1
     """, { rs, _ ->
-            Triple(
-                rs.getInt("hour"),
-                rs.getInt("consultation_count"),
-                rs.getDouble("percentage")
-            )
-        }, companyId).firstOrNull() ?: Triple(0, 0, 0.0)
+                Triple(
+                    rs.getInt("hour"),
+                    rs.getInt("consultation_count"),
+                    rs.getDouble("percentage")
+                )
+            }, companyId
+        ).firstOrNull() ?: Triple(0, 0, 0.0)
 
         // Calculate high traffic percentage for the peak hour
-        val highTrafficPercentage = jdbcTemplate.queryForObject("""
+        val highTrafficPercentage = jdbcTemplate.queryForObject(
+            """
         WITH peak_hour_consultations AS (
             SELECT COUNT(*) as peak_count
             FROM consultations
@@ -316,16 +330,19 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
                 ELSE ROUND((COALESCE(peak_count, 0) * 100.0 / total_count)::numeric, 2)
             END as traffic_percentage
         FROM peak_hour_consultations, total_consultations
-    """, Double::class.java, companyId, peakHoursData.first, companyId)
+    """, Double::class.java, companyId, peakHoursData.first, companyId
+        )
 
         // Get total consultations from last day including paid ones
-        val lastDayConsultations = jdbcTemplate.queryForObject("""
+        val lastDayConsultations = jdbcTemplate.queryForObject(
+            """
         SELECT COUNT(*) as total_consultations
         FROM consultations
         WHERE company_id = ?
         AND DATE_TRUNC('day', consultation_date) = DATE_TRUNC('day', CURRENT_DATE - INTERVAL '1 day')
         AND status IN ('ATTENDED', 'PAID')
-    """, Int::class.java, companyId)
+    """, Int::class.java, companyId
+        )
 
         // Format peak hour in 12-hour format with AM/PM
         val peakHourFormatted = if (peakHoursData.second == 0) {
@@ -347,7 +364,8 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun getEmployeeResume(companyId: Long): EmployeeResumeDTO {
-        val roleCounts = jdbcTemplate.query("""
+        val roleCounts = jdbcTemplate.query(
+            """
         SELECT r.name, COUNT(DISTINCT ur.user_id) as user_count
         FROM roles r
         LEFT JOIN user_roles ur ON r.id = ur.role_id
@@ -355,11 +373,12 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
         WHERE r.company_id = ?
         GROUP BY r.name
     """, { rs, _ ->
-            Pair(
-                rs.getString("name"),
-                rs.getInt("user_count")
-            )
-        }, companyId)
+                Pair(
+                    rs.getString("name"),
+                    rs.getInt("user_count")
+                )
+            }, companyId
+        )
 
         val mapTotals = HashMap<String, Int>()
         roleCounts.forEach { (roleName, count) ->
@@ -370,18 +389,54 @@ class JpaDashboardRepository(private val jdbcTemplate: JdbcTemplate) {
     }
 
     fun getServiceResume(companyId: Long): ServiceResumeDTO {
-        val sql = """
-        SELECT 
-            name
-        FROM services
-        WHERE company_id = ?
-    """
+        val sql = "SELECT name FROM services WHERE company_id = ?"
         val serviceNames: Set<String> = jdbcTemplate.query(sql, { rs, _ ->
             rs.getString("name")
         }, companyId).toSet()
         return ServiceResumeDTO(
             mapTotals = serviceNames
         )
+    }
+
+    fun getAttentionResume(companyId: Long): List<AttentionResumeDTO> {
+        val attentions = mutableListOf<AttentionResumeDTO>()
+        val sql = """
+            SELECT DATE(c.consultation_date) AS consultation_date, COUNT(*) AS consultation_count
+            FROM consultations c WHERE c.company_id = ?
+            GROUP BY DATE(c.consultation_date)
+            ORDER BY DATE(c.consultation_date) DESC
+            LIMIT 5;
+            """
+        val resultSet = jdbcTemplate.query(
+            sql,
+            { rs, _ -> Pair(rs.getDate("consultation_date"), rs.getInt("consultation_count")) },
+            companyId
+        )
+        resultSet.forEach { (date, count) ->
+            attentions.add(AttentionResumeDTO(date, count))
+        }
+        return attentions
+    }
+
+    fun getProductResume(companyId: Long): List<ProductResumeDTO> {
+        val products = mutableListOf<ProductResumeDTO>()
+        val sql = """
+           select i.name, sum(bd.quantity) as quantity from billing_details bd 
+           inner join billing b on b.billing_id = bd.billing_id 
+           inner join inventory i on bd.inventory_id = bd.inventory_id
+           where b.company_id = ?
+           and b.transaction_date > now()::DATE - 60
+           group by i.name limit 4;
+        """
+        val resultSet = jdbcTemplate.query(
+            sql,
+            { rs, _ -> Pair(rs.getString("name"), rs.getInt("quantity")) },
+            companyId
+        )
+        resultSet.forEach { (name, quantity) ->
+            products.add(ProductResumeDTO(name, quantity))
+        }
+        return products
     }
 
 }

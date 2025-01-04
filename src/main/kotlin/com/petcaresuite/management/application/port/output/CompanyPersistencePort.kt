@@ -39,4 +39,8 @@ interface CompanyPersistencePort {
 
     fun getServiceResume(companyId: Long): ServiceResumeDTO
 
+    fun getAttentionResume(companyId: Long): List<AttentionResumeDTO>
+
+    fun getProductResume(companyId: Long): List<ProductResumeDTO>
+
 }

@@ -87,4 +87,12 @@ class CompanyRepositoryAdapter(
         return dashboardRepository.getServiceResume(companyId)
     }
 
+    override fun getAttentionResume(companyId: Long): List<AttentionResumeDTO> {
+        return dashboardRepository.getAttentionResume(companyId)
+    }
+
+    override fun getProductResume(companyId: Long): List<ProductResumeDTO> {
+        return dashboardRepository.getProductResume(companyId)
+    }
+
 }

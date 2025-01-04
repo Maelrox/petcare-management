@@ -1,7 +1,8 @@
 package com.petcaresuite.management.application.dto
 
+import java.util.*
+
 data class AttentionResumeDTO(
-    val peakHours: String,
-    val highTraffic: Int,
-    val appointments: Int,
+    val date: Date,
+    val quantity: Int
 )
