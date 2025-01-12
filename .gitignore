@@ -25,7 +25,6 @@ mvnw.cmd
 .gradle/
 
 # Gradle
-gradle/
 build/
 
 # Dependencies
